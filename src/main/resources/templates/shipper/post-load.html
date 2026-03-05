@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Load | FreightHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #7c3aed;
+            --accent: #34A853;
+            --light: #F8F9FA;
+            --dark: #2C3E50;
+            --gray: #6C757D;
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%); color: var(--dark); min-height: 100vh; }
+        
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        
+	.btn {
+	     cursor: pointer;
+	     color:  #4f46e5;
+		 width:160px;
+		 position: relative;
+		 left:20px;
+         top:20px;
+	 }
+	 .btn:hover{
+	     border-bottom:2px solid #4f46e5 ;
+	 }
+        header { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            border-left: 5px solid var(--secondary);
+        }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo i { color: var(--primary); font-size: 28px; }
+        h1 { color: var(--primary); font-size: 26px; font-weight: 700; }
+        .subtitle { color: var(--gray); margin-top: 5px; font-size: 14px; }
+        
+        .form-card { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 30px; 
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--accent);
+        }
+        
+        .form-row { display: flex; gap: 20px; margin-bottom: 20px; }
+        .form-col { flex: 1; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: var(--dark);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        label i { margin-right: 8px; color: var(--primary); }
+        
+        input, select, textarea { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 2px solid #E9ECEF; 
+            border-radius: 8px; 
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus, textarea:focus { 
+            outline: none; 
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(42, 92, 170, 0.1);
+        }
+        
+        .image-section { 
+            border: 2px dashed #DEE2E6; 
+            border-radius: 8px; 
+            padding: 25px; 
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .image-section:hover { border-color: var(--primary); background: #F8F9FA; }
+        .upload-icon { color: var(--primary); font-size: 36px; margin-bottom: 10px; }
+        .image-preview { display: flex; gap: 12px; margin-top: 15px; flex-wrap: wrap; }
+        .preview-img { 
+            width: 80px; 
+            height: 80px; 
+            object-fit: cover; 
+            border-radius: 6px;
+            border: 2px solid #E9ECEF;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .unit-toggle { 
+            display: flex; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            border: 2px solid #E9ECEF;
+            width: fit-content;
+        }
+        .unit-btn { 
+            padding: 10px 20px; 
+            background: white; 
+            border: none; 
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .unit-btn.active { 
+            background: var(--primary); 
+            color: white;
+        }
+        
+        .location-input { display: flex; gap: 10px; margin-bottom: 10px; }
+        .location-input input { flex: 1; }
+        .loc-btn { 
+            padding: 0 20px; 
+            background: var(--secondary); 
+            color: white; 
+            border: none; 
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 100px;
+        }
+        .loc-btn:hover { background: #E85A2B; }
+        .loc-btn i { margin-right: 5px; }
+        
+        .map-container { 
+            height: 200px; 
+            border-radius: 8px; 
+            margin-top: 10px; 
+            border: 2px solid #E9ECEF;
+            overflow: hidden;
+        }
+        .coordinates { 
+            font-size: 11px; 
+            color: var(--gray); 
+            margin-top: 5px;
+            background: #F8F9FA;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .price-input { position: relative; }
+        .rupee { 
+            position: absolute; 
+            left: 15px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .price-input input { padding-left: 40px; }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, #1E4A8F 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(42, 92, 170, 0.3);
+        }
+        .submit-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(42, 92, 170, 0.4);
+        }
+        .submit-btn:active { transform: translateY(0); }
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: 0 4px 15px rgba(42, 92, 170, 0.3) !important;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal.active { display: flex; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideUp 0.4s;
+        }
+        @keyframes slideUp { 
+            from { transform: translateY(30px); opacity: 0; } 
+            to { transform: translateY(0); opacity: 1; } 
+        }
+        
+        .success-icon {
+            color: var(--accent);
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        .ref-number {
+            font-size: 24px;
+            color: var(--primary);
+            font-weight: 800;
+            margin: 15px 0;
+            letter-spacing: 1px;
+            background: #F0F7FF;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px dashed var(--primary);
+        }
+        .close-modal {
+            padding: 12px 30px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row { flex-direction: column; gap: 0; }
+            .container { padding: 15px; }
+            .form-card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="btn" onclick="window.location.href='/dashboard'"><i class="fas fa-arrow-left"></i> Back to Dashboard </div>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-shipping-fast"></i>
+                <div>
+
+                    <h1>Post a Load</h1>
+                    <p class="subtitle">Ship your goods with confidence</p>
+                </div>
+            </div>
+        </header>
+        
+        <div class="form-card">
+            <form id="loadForm">
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label><i class="fas fa-box"></i> Load Type</label>
+                            <input type="text" id="loadType" placeholder="e.g., Electronics, Machinery" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-weight-hanging"></i> Weight</label>
+                            <div class="unit-toggle">
+                                <button type="button" class="unit-btn active" data-unit="kg">Kilograms</button>
+                                <button type="button" class="unit-btn" data-unit="ton">Ton</button>
+                            
+                            </div>
+                            <input type="number" id="weight" placeholder="Enter weight" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-indian-rupee-sign"></i> Expected Price</label>
+                            <div class="price-input">
+                                <span class="rupee">?</span>
+                                <input type="number" id="price" placeholder="Enter amount" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label><i class="fas fa-images"></i> Load Images</label>
+                            <div class="image-section" id="imageUpload">
+                                <div class="upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <p>Click to upload images (Max 5)</p>
+                                <p><small>JPG, PNG up to 2MB</small></p>
+                                <input  type="file" id="imageInput" multiple style="display:none;" accept="image/*" required >
+                            </div>
+                            <div class="image-preview" id="imagePreview"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i> Pickup Location</label>
+                            <div class="location-input">
+                                <input type="text" id="pickupLoc" placeholder="Enter pickup address" required>
+                                <button type="button" class="loc-btn" id="liveLocBtn">
+                                    <i class="fas fa-location-crosshairs"></i> Live
+                                </button>
+                            </div>
+                            <div class="map-container" id="pickupMap"></div>
+                            <div class="coordinates" id="pickupCoords">Lat: --, Lng: --</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label><i class="fas fa-flag-checkered"></i> Drop Location</label>
+                            <div class="location-input">
+                                <input type="text" id="dropLoc" placeholder="Enter drop address" required>
+                                <button type="button" class="loc-btn" id="searchLocBtn">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                            <div class="map-container" id="dropMap"></div>
+                            <div class="coordinates" id="dropCoords">Lat: --, Lng: --</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-alt"></i> Delivery Date</label>
+                            <input type="date" id="deliveryDate" required>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label><i class="fas fa-file-alt"></i> Additional Details</label>
+                            <textarea id="details" rows="2" placeholder="Special instructions..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <i class="fas fa-paper-plane"></i> Post Load Now
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Load Posted Successfully!</h2>
+            <p>Your shipment is now visible to carriers</p>
+            <div class="ref-number" id="refNumber">LD-2024-827591</div>
+            <p style="color: var(--gray); font-size: 14px; margin: 10px 0;">
+                Save this reference number for tracking
+            </p>
+            <button class="close-modal" id="closeModal">Done</button>
+        </div>
+    </div>
+
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    /* ===============================
+       COLOR PALETTE
+    ================================ */
+    const colors = {
+        primary: '#2A5CAA',
+        secondary: '#FF6B35',
+        accent: '#34A853'
+    };
+
+    /* ===============================
+       DOM REFERENCES
+    ================================ */
+    const loadForm = document.getElementById("loadForm");
+    const loadTypeEl = document.getElementById("loadType");
+    const weightEl = document.getElementById("weight");
+    const priceEl = document.getElementById("price");
+    const pickupLocEl = document.getElementById("pickupLoc");
+    const dropLocEl = document.getElementById("dropLoc");
+    const deliveryDateEl = document.getElementById("deliveryDate");
+    const detailsEl = document.getElementById("details");
+    const imageInputEl = document.getElementById("imageInput");
+    const successModal = document.getElementById("successModal");
+    const refNumberEl = document.getElementById("refNumber");
+    const closeModalBtn = document.getElementById("closeModal");
+    const submitBtn = document.getElementById("submitBtn");
+
+    async function ensureShipperKycCompleted() {
+        try {
+            const response = await fetch("/api/kyc/status", { credentials: "include" });
+            if (response.status === 401) {
+                window.location.href = "/login";
+                return false;
+            }
+            if (!response.ok) {
+                alert("Unable to verify KYC status");
+                return false;
+            }
+
+            const payload = await response.json();
+            if (payload && payload.kycCompleted === true) {
+                return true;
+            }
+
+            alert("Please complete KYC before posting a load.");
+            window.location.href = "/shipper-verification?kycRequired=post-load";
+            return false;
+        } catch (err) {
+            alert("Unable to verify KYC status");
+            return false;
+        }
+    }
+
+    /* ===============================
+       MAP VARIABLES
+    ================================ */
+    let pickupMap, dropMap;
+    let pickupMarker = null;
+    let dropMarker = null;
+    let pickupCoords = null;
+    let dropCoords = null;
+    let pickupAddressDirty = false;
+    let dropAddressDirty = false;
+
+    async function reverseGeocode(lat, lng) {
+        const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+        );
+        if (!res.ok) throw new Error("Reverse geocode failed");
+        const data = await res.json();
+        return data.display_name || "";
+    }
+
+    async function geocodeAddress(address) {
+        const res = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`
+        );
+        if (!res.ok) throw new Error("Geocode failed");
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) return null;
+
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+        return { lat, lng };
+    }
+
+    async function setPickupByCoords(lat, lng, fillAddress = false) {
+        pickupCoords = { lat, lng };
+        if (pickupMarker) pickupMap.removeLayer(pickupMarker);
+        pickupMarker = L.marker([lat, lng]).addTo(pickupMap);
+        pickupMap.setView([lat, lng], 13);
+        document.getElementById("pickupCoords").textContent =
+            `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
+
+        if (fillAddress) {
+            const address = await reverseGeocode(lat, lng);
+            if (address) pickupLocEl.value = address;
+        }
+        pickupAddressDirty = false;
+    }
+
+    async function setDropByCoords(lat, lng, fillAddress = false) {
+        dropCoords = { lat, lng };
+        if (dropMarker) dropMap.removeLayer(dropMarker);
+        dropMarker = L.marker([lat, lng]).addTo(dropMap);
+        dropMap.setView([lat, lng], 13);
+        document.getElementById("dropCoords").textContent =
+            `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
+
+        if (fillAddress) {
+            const address = await reverseGeocode(lat, lng);
+            if (address) dropLocEl.value = address;
+        }
+        dropAddressDirty = false;
+    }
+
+    pickupLocEl.addEventListener("input", () => {
+        pickupAddressDirty = true;
+    });
+    dropLocEl.addEventListener("input", () => {
+        dropAddressDirty = true;
+    });
+
+    /* ===============================
+       MAP INIT
+    ================================ */
+    function initMaps() {
+        pickupMap = L.map('pickupMap').setView([20.5937, 78.9629], 5);
+        dropMap = L.map('dropMap').setView([20.5937, 78.9629], 5);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(pickupMap);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(dropMap);
+
+        pickupMap.on("click", async e => {
+            try {
+                await setPickupByCoords(e.latlng.lat, e.latlng.lng, true);
+            } catch (err) {
+                alert("Unable to set pickup location");
+            }
+        });
+
+        dropMap.on("click", async e => {
+            try {
+                await setDropByCoords(e.latlng.lat, e.latlng.lng, true);
+            } catch (err) {
+                alert("Unable to set drop location");
+            }
+        });
+    }
+
+    /* ===============================
+       LIVE PICKUP LOCATION
+    ================================ */
+    document.getElementById("liveLocBtn").addEventListener("click", () => {
+        const btn = document.getElementById("liveLocBtn");
+
+        if (!navigator.geolocation) {
+            alert("Geolocation not supported");
+            return;
+        }
+
+        // UI state
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Detecting`;
+
+        navigator.geolocation.getCurrentPosition(
+            async pos => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+
+                try {
+                    await setPickupByCoords(lat, lng, true);
+                } catch (err) {
+                    alert("Unable to resolve pickup address");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="fas fa-location-crosshairs"></i> Live`;
+                }
+            },
+            () => {
+                alert("Location permission denied");
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-location-crosshairs"></i> Live`;
+            }
+        );
+    });
+
+    /* ===============================
+       DROP LOCATION SEARCH
+    ================================ */
+    document.getElementById("searchLocBtn").addEventListener("click", async () => {
+        const btn = document.getElementById("searchLocBtn");
+        const address = dropLocEl.value.trim();
+
+        if (!address) {
+            alert("Enter drop address");
+            return;
+        }
+
+        // UI loading state
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Searching`;
+
+        try {
+            const coords = await geocodeAddress(address);
+            if (!coords) {
+                alert("Location not found");
+                return;
+            }
+            await setDropByCoords(coords.lat, coords.lng, false);
+
+        } catch (err) {
+            alert("Search failed");
+        } finally {
+            // restore button always
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fas fa-search"></i> Search`;
+        }
+    });
+
+    /* ===============================
+       IMAGE UPLOAD PREVIEW
+    ================================ */
+    document.getElementById("imageUpload").addEventListener("click", () => {
+        imageInputEl.click();
+    });
+
+    imageInputEl.addEventListener("change", e => {
+        const preview = document.getElementById("imagePreview");
+        preview.innerHTML = "";
+
+        Array.from(e.target.files).slice(0, 5).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = ev => {
+                const img = document.createElement("img");
+                img.className = "preview-img";
+                img.src = ev.target.result;
+                preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    /* ===============================
+       WEIGHT UNIT TOGGLE
+    ================================ */
+    document.querySelectorAll(".unit-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".unit-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+        });
+    });
+
+    /* ===============================
+       FORM SUBMIT (WITH BUTTON RESTRICTION)
+    ================================ */
+    loadForm.addEventListener("submit", async e => {
+        e.preventDefault();
+
+        // Disable submit button immediately
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Posting...`;
+
+        try {
+            const kycCompleted = await ensureShipperKycCompleted();
+            if (!kycCompleted) {
+                return;
+            }
+
+            if (pickupAddressDirty || !pickupCoords) {
+                const pickupAddress = pickupLocEl.value.trim();
+                if (!pickupAddress) {
+                    alert("Pickup location required");
+                    return;
+                }
+                const pickup = await geocodeAddress(pickupAddress);
+                if (!pickup) {
+                    alert("Pickup location not found");
+                    return;
+                }
+                await setPickupByCoords(pickup.lat, pickup.lng, false);
+            }
+
+            if (dropAddressDirty || !dropCoords) {
+                const dropAddress = dropLocEl.value.trim();
+                if (!dropAddress) {
+                    alert("Drop location required");
+                    return;
+                }
+                const drop = await geocodeAddress(dropAddress);
+                if (!drop) {
+                    alert("Drop location not found");
+                    return;
+                }
+                await setDropByCoords(drop.lat, drop.lng, false);
+            }
+
+            const weight = parseFloat(weightEl.value);
+            const price = parseFloat(priceEl.value);
+
+            if (!Number.isFinite(weight) || !Number.isFinite(price)) {
+                alert("Weight & Price must be valid numbers");
+                return;
+            }
+
+            const unitBtn = document.querySelector(".unit-btn.active");
+            if (!unitBtn) {
+                alert("Select weight unit");
+                return;
+            }
+
+            const userId = localStorage.getItem("userId");
+            if (!userId) {
+                alert("Please login first");
+                window.location.href = "/login";
+                return;
+            }
+
+            const formData = new FormData();
+
+            formData.append("loadType", loadTypeEl.value.trim());
+            formData.append("weight", weight.toString());
+            formData.append("weightUnit", unitBtn.dataset.unit);
+            formData.append("price", price.toString());
+            formData.append("pickupAddress", pickupLocEl.value.trim());
+            formData.append("pickupLat", pickupCoords.lat.toString());
+            formData.append("pickupLng", pickupCoords.lng.toString());
+            formData.append("dropAddress", dropLocEl.value.trim());
+            formData.append("dropLat", dropCoords.lat.toString());
+            formData.append("dropLng", dropCoords.lng.toString());
+            formData.append("deliveryDate", deliveryDateEl.value);
+            formData.append("details", detailsEl.value || "");
+
+            if (imageInputEl.files.length > 0) {
+                formData.append("images", imageInputEl.files[0]);
+            }
+
+            const response = await fetch("/api/loads-posting", {
+                method: "POST",
+                body: formData,
+				credentials: "include"
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                if (response.status === 401) {
+                    window.location.href = "/login";
+                    return;
+                }
+                if (response.status === 403 && result && result.kycRequired) {
+                    alert(result.message || "Please complete KYC before posting a load.");
+                    window.location.href = result.redirectUrl || "/shipper-verification?kycRequired=post-load";
+                    return;
+                }
+                alert(result.message || "Failed to post load");
+                return;
+            }
+
+            refNumberEl.textContent = result.referenceId;
+            successModal.classList.add("active");
+
+        } catch (err) {
+            alert("Server error: " + err.message);
+        } finally {
+            // Re-enable button only after response
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    });
+
+    /* ===============================
+       CLOSE MODAL
+    ================================ */
+    closeModalBtn.addEventListener("click", () => {
+        successModal.classList.remove("active");
+        loadForm.reset();
+        document.getElementById("imagePreview").innerHTML = "";
+        document.getElementById("pickupCoords").textContent = "Lat: --, Lng: --";
+        document.getElementById("dropCoords").textContent = "Lat: --, Lng: --";
+        pickupCoords = dropCoords = null;
+        pickupAddressDirty = false;
+        dropAddressDirty = false;
+        
+        // Clear map markers
+        if (pickupMarker) {
+            pickupMap.removeLayer(pickupMarker);
+            pickupMarker = null;
+        }
+        if (dropMarker) {
+            dropMap.removeLayer(dropMarker);
+            dropMarker = null;
+        }
+        
+        // Reset map views
+        pickupMap.setView([20.5937, 78.9629], 5);
+        dropMap.setView([20.5937, 78.9629], 5);
+    });
+
+    /* ===============================
+       INIT
+    ================================ */
+    document.addEventListener("DOMContentLoaded", () => {
+        ensureShipperKycCompleted().then(kycCompleted => {
+            if (!kycCompleted) return;
+
+            initMaps();
+
+            // Set min date to today
+            const today = new Date().toISOString().split("T")[0];
+            deliveryDateEl.min = today;
+
+            // Set default date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            deliveryDateEl.value = tomorrow.toISOString().split("T")[0];
+        });
+    });
+    </script>
+    <script src="/js/completionPopperGlobal.js"></script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,30 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="content">
+    <div class="title">
+        <h3>Shipper Dashboard</h3>
+    </div>
+    
+    <div class="cards-container">
+        <div class="card" onclick="goPostLoadWithKycCheck()">
+            <div class="card-title" >Post Load</div>
+            <div class="card-description">Create and publish new transportation requests with detailed specifications and requirements.</div>
+        </div>
+        
+        <div class="card"onclick="window.location.href='shipper/myActivities'">
+            <div class="card-title" >My Loads</div>
+            <div class="card-description">			
+			Manage all your active loads, track status, and update transportation details.</div>
+        </div>
+        <div class="card" onclick="window.location.href='shipper/load-history'">
+            <div class="card-title">Load History</div>
+            <div class="card-description">Access complete history of all your completed and archived transportation requests.</div>
+        </div>
+		
+        <div class="card" onclick="goTo('creditsReviewPage')">
+            <div class="card-title">Credits & Review</div>
+            <div class="card-description">View cargo credits earned, shipper name, and star reviews in one page.</div>
+        </div>
+        <div class="btn" onclick="window.location.href='/dashboard'"><i class="fas fa-arrow-left"></i> Back to Dashboard </div>
+    </div>
+</div>

@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipper Verification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background: #f3f4f6;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            box-shadow: 0 20px 60px rgba(0,0,0,.25);
+            border-radius: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: #fff;
+            padding: 25px;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .form-container {
+            padding: 30px;
+        }
+        
+        .form-section {
+            background:#f9fafb;
+            border-radius:12px;
+            padding:25px;
+            margin-bottom:25px;
+            border:1px solid #e5e7eb
+            
+        }
+        
+        .form-section h3 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-section h3 i {
+            color: #4f46e5;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 0.95rem;
+        }
+        
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 95%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #4f46e5;
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .form-group input.error,
+        .form-group select.error,
+        .form-group textarea.error {
+            border-color: #e74c3c;
+        }
+        
+        .form-group input.success,
+        .form-group select.success,
+        .form-group textarea.success {
+            border-color: #10b981;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .file-upload-container {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        .file-upload-container:hover {
+            border-color: #4f46e5;
+            background: #f0f7ff;
+        }
+        
+        .file-upload-container i {
+            font-size: 2rem;
+            color: #4f46e5;
+            margin-bottom: 10px;
+        }
+        
+        .file-name {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-top: 10px;
+            padding: 8px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            word-break: break-all;
+        }
+        
+        .info-text {
+            color: #6b7280;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .checkbox-group input {
+            margin-top: 3px;
+        }
+        
+        .checkbox-group label {
+            font-size: 0.95rem;
+            color: #34495e;
+            line-height: 1.5;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(79, 70, 229, 0.3);
+        }
+        
+        .btn-reset {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .btn-reset:hover {
+            background: #d1d5db;
+        }
+        
+        .btn-submit:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            display: none;
+            background: #d1fae5;
+            color: #065f46;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            border-left: 4px solid #10b981;
+        }
+        
+        .security-note {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.9rem;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .address-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+         .security-note i {
+            color: #3498db;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2><i class="fas fa-shipping-fast"></i> Shipper Verification</h2>
+            <p>Please provide accurate information for verification. All fields are mandatory unless specified.</p>
+
+        </div>
+
+        <div class="form-container">
+            <!-- Success Message -->
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i> Verification submitted successfully!
+            </div>
+
+            <!-- Personal Details Section -->
+            <div class="form-section">
+                <h3><i class="fas fa-user"></i> Personal Details</h3>
+                <div class="form-grid">
+                    
+                    <div class="form-group">
+                        <label class="required">Name as per Aadhar</label>
+                        <input type="text" id="aadharName" name="aadharName" placeholder="Enter name as on Aadhar card">
+                        <div class="error-message" id="aadharNameError">Please enter your name</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Aadhar Number</label>
+                        <input type="text" id="aadharNumber" name="aadharNumber" placeholder="Enter 12-digit Aadhar" maxlength="12">
+                        <div class="error-message" id="aadharNumberError">Please enter valid 12-digit Aadhar</div>
+                        <div class="info-text">12-digit number</div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="required">Aadhar Card Image</label>
+                        <div class="file-upload-container" id="aadharUpload">
+                            <i class="fas fa-file-upload"></i>
+                            <p>Upload Aadhar Card</p>
+                            <div class="info-text">Max 5MB - JPG, PNG, PDF</div>
+                        </div>
+                        <input type="file" id="aadharImage" name="aadharImage" accept="image/*,.pdf" style="display: none;">
+                        <div class="file-name" id="aadharFileName"></div>
+                        <div class="error-message" id="aadharImageError">Please upload Aadhar card</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">User Photo</label>
+                        <div class="file-upload-container" id="photoUpload">
+                            <i class="fas fa-camera"></i>
+                            <p>Upload Your Photo</p>
+                            <div class="info-text">Max 2MB - JPG, PNG</div>
+                        </div>
+                        <input type="file" id="userPhoto" name="userPhoto" accept="image/*" style="display: none;">
+                        <div class="file-name" id="photoFileName"></div>
+                        <div class="error-message" id="userPhotoError">Please upload your photo</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Business Details Section -->
+            <div class="form-section">
+                <h3><i class="fas fa-building"></i> Business Details</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="required">Company Name</label>
+                        <input type="text" id="companyName" name="companyName" placeholder="Enter company name">
+                        <div class="error-message" id="companyNameError">Please enter company name</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">GSTIN</label>
+                        <input type="text" id="gstin" name="gstin" placeholder="Enter 15-character GSTIN" maxlength="15">
+                        <div class="error-message" id="gstinError">Please enter valid GSTIN</div>
+                        <div class="info-text">Format: 22AAAAA0000A1Z5</div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="required">Business Email</label>
+                        <input type="email" id="businessEmail" name="businessEmail" placeholder="Enter business email">
+                        <div class="error-message" id="businessEmailError">Please enter valid email</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Business Mobile</label>
+                        <input type="tel" id="businessMobile" name="businessMobile" placeholder="Enter 10-digit number" maxlength="10">
+                        <div class="error-message" id="businessMobileError">Please enter valid mobile number</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address Section -->
+            <div class="form-section">
+                <h3><i class="fas fa-map-marker-alt"></i> Address</h3>
+                <div class="form-group">
+                    <label class="required">Complete Address</label>
+                    <textarea id="address" name="address" rows="3" placeholder="Enter complete business address"></textarea>
+                    <div class="error-message" id="addressError">Please enter address</div>
+                </div>
+
+                <div class="address-grid">
+                    <div class="form-group">
+                        <label class="required">City</label>
+                        <input type="text" id="city" name="city" placeholder="Enter city">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">State</label>
+                        <select id="state" name="state">
+                            <option value="">Select State</option>
+                            <option value="MH">Maharashtra</option>
+                            <option value="DL">Delhi</option>
+                            <option value="KA">Karnataka</option>
+                            <option value="TN">Tamil Nadu</option>
+                            <option value="GJ">Gujarat</option>
+                            <option value="UP">Uttar Pradesh</option>
+                            <option value="WB">West Bengal</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Pincode</label>
+                        <input type="text" id="pincode" name="pincode" placeholder="Enter 6-digit pincode" maxlength="6">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Declaration -->
+            <div class="checkbox-group">
+                <input type="checkbox" id="declaration" name="declaration">
+                <label for="declaration">
+                    I declare that all information provided is true and correct
+                </label>
+            </div>
+            <div class="error-message" id="declarationError">Please accept the declaration</div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="button" class="btn btn-reset" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <button type="button" class="btn btn-submit" id="submitBtn">
+                    <div class="spinner" id="submitSpinner"></div>
+                    <i class="fas fa-paper-plane"></i> Submit
+                </button>
+            </div>
+
+            <div class="security-note">
+                <p><i class="fas fa-shield-alt"></i> Your information is secured with 256-bit SSL encryption. We respect your privacy and will never share your data with unauthorized parties.</p>
+                <p style="margin-top: 10px;">For assistance, contact: support@shipperportal.com | +91 1800-123-4567</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const query = new URLSearchParams(window.location.search);
+            const kycReason = query.get("kycRequired");
+            if (kycReason === "post-load") {
+                alert("Complete KYC first. Then you can post load.");
+            }
+
+            // DOM Elements
+            const submitBtn = document.getElementById('submitBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const submitSpinner = document.getElementById('submitSpinner');
+            const successMessage = document.getElementById('successMessage');
+            
+            // File upload elements
+            const aadharUpload = document.getElementById('aadharUpload');
+            const aadharInput = document.getElementById('aadharImage');
+            const aadharFileName = document.getElementById('aadharFileName');
+            
+            const photoUpload = document.getElementById('photoUpload');
+            const photoInput = document.getElementById('userPhoto');
+            const photoFileName = document.getElementById('photoFileName');
+            
+            // File upload functionality for Aadhar
+            aadharUpload.addEventListener('click', () => aadharInput.click());
+            aadharInput.addEventListener('change', function() {
+                handleFileUpload(this, aadharFileName, 'aadharImageError');
+            });
+            
+            // File upload functionality for Photo
+            photoUpload.addEventListener('click', () => photoInput.click());
+            photoInput.addEventListener('change', function() {
+                handleFileUpload(this, photoFileName, 'userPhotoError');
+            });
+            
+            function handleFileUpload(input, fileNameElement, errorId) {
+                if (input.files && input.files[0]) {
+                    const file = input.files[0];
+                    const fileSize = file.size / 1024 / 1024; // in MB
+                    
+                    // Validate file size
+                    let maxSize = 5; // MB
+                    if (input.id === 'userPhoto') maxSize = 2;
+                    
+                    if (fileSize > maxSize) {
+                        showError(errorId, `File too large (max ${maxSize}MB)`);
+                        return;
+                    }
+                    
+                    // Show file name
+                    fileNameElement.textContent = `Uploaded: ${file.name} (${fileSize.toFixed(2)} MB)`;
+                    fileNameElement.style.display = 'block';
+                    
+                    // Update upload area
+                    const uploadArea = input.previousElementSibling;
+                    uploadArea.innerHTML = `
+                        <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                        <p>File uploaded</p>
+                        <div class="info-text">${fileSize.toFixed(2)} MB</div>
+                    `;
+                    uploadArea.style.borderColor = '#10b981';
+                    uploadArea.style.background = '#f0fff4';
+                    
+                    clearError(errorId);
+                }
+            }
+            
+
+            // Real-time validation for Aadhar number
+            const aadharNumberInput = document.getElementById('aadharNumber');
+            aadharNumberInput.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, ''); // Only numbers
+                if (this.value.length === 12) {
+                    this.classList.remove('error');
+                    this.classList.add('success');
+                    clearError('aadharNumberError');
+                } else if (this.value.length > 0) {
+                    this.classList.add('error');
+                }
+            });
+            
+            // Real-time validation for GSTIN
+            const gstinInput = document.getElementById('gstin');
+            gstinInput.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+                if (this.value.length === 15) {
+                    this.classList.remove('error');
+                    this.classList.add('success');
+                    clearError('gstinError');
+                } else if (this.value.length > 0) {
+                    this.classList.add('error');
+                }
+            });
+            
+            // Real-time validation for mobile number
+            const mobileInput = document.getElementById('businessMobile');
+            mobileInput.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, ''); // Only numbers
+                if (this.value.length === 10) {
+                    this.classList.remove('error');
+                    this.classList.add('success');
+                    clearError('businessMobileError');
+                } else if (this.value.length > 0) {
+                    this.classList.add('error');
+                }
+            });
+            
+            // Form validation
+            function validateForm() {
+                let isValid = true;
+                
+                // Clear all errors
+                const errorMessages = document.querySelectorAll('.error-message');
+                errorMessages.forEach(error => error.style.display = 'none');
+                
+                // Validate text fields
+                const requiredFields = [
+                    { id: 'aadharName', errorId: 'aadharNameError', message: 'Please enter name' },
+                    { id: 'aadharNumber', errorId: 'aadharNumberError', message: 'Please enter valid 12-digit Aadhar', 
+                      validator: (value) => /^\d{12}$/.test(value) },
+                    { id: 'companyName', errorId: 'companyNameError', message: 'Please enter company name' },
+                    { id: 'businessEmail', errorId: 'businessEmailError', message: 'Please enter valid email',
+                      validator: (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) },
+                    { id: 'businessMobile', errorId: 'businessMobileError', message: 'Please enter valid 10-digit number',
+                      validator: (value) => /^\d{10}$/.test(value) },
+                    { id: 'gstin', errorId: 'gstinError', message: 'Please enter valid GSTIN',
+                      validator: (value) => /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(value) },
+                    { id: 'address', errorId: 'addressError', message: 'Please enter address' },
+                    { id: 'city', errorId: '', message: '' },
+                    { id: 'state', errorId: '', message: '' },
+                    { id: 'pincode', errorId: '', message: '',
+                      validator: (value) => /^\d{6}$/.test(value) }
+                ];
+                
+                requiredFields.forEach(field => {
+                    const element = document.getElementById(field.id);
+                    const value = element.value.trim();
+                    
+                    if (!value) {
+                        if (field.errorId) {
+                            showError(field.errorId, field.message);
+                            element.classList.add('error');
+                            isValid = false;
+                        }
+                    } else if (field.validator && !field.validator(value)) {
+                        if (field.errorId) {
+                            showError(field.errorId, field.message);
+                            element.classList.add('error');
+                            isValid = false;
+                        }
+                    } else {
+                        element.classList.remove('error');
+                        element.classList.add('success');
+                        if (field.errorId) clearError(field.errorId);
+                    }
+                });
+                
+                // Validate file uploads
+                if (!aadharInput.files.length) {
+                    showError('aadharImageError', 'Please upload Aadhar card');
+                    isValid = false;
+                }
+                
+                if (!photoInput.files.length) {
+                    showError('userPhotoError', 'Please upload your photo');
+                    isValid = false;
+                }
+                
+                // Validate declaration
+                const declaration = document.getElementById('declaration');
+                if (!declaration.checked) {
+                    showError('declarationError', 'Please accept the declaration');
+                    isValid = false;
+                }
+                
+                return isValid;
+            }
+            
+			submitBtn.addEventListener('click', async function () {
+			    if (!validateForm()) return;
+
+			    submitBtn.disabled = true;
+			    submitSpinner.style.display = 'inline-block';
+
+			    try {
+			        const formData = new FormData();
+
+			        const userId = localStorage.getItem("userId");
+			        if (!userId) {
+			            alert("Please login again");
+			            return;
+			        }
+
+			        formData.append("userId", userId);
+			        formData.append("aadharName", document.getElementById("aadharName").value);
+			        formData.append("aadharNumber", document.getElementById("aadharNumber").value);
+			        formData.append("aadharImage", document.getElementById("aadharImage").files[0]);
+			        formData.append("userPhoto", document.getElementById("userPhoto").files[0]);
+
+			        formData.append("companyName", document.getElementById("companyName").value);
+			        formData.append("gstin", document.getElementById("gstin").value);
+			        formData.append("businessEmail", document.getElementById("businessEmail").value);
+			        formData.append("businessMobile", document.getElementById("businessMobile").value);
+
+			        formData.append("address", document.getElementById("address").value);
+			        formData.append("city", document.getElementById("city").value);
+			        formData.append("state", document.getElementById("state").value);
+			        formData.append("pincode", document.getElementById("pincode").value);
+
+			        const response = await fetch("/api/shipper-verification", {
+			            method: "POST",
+			            body: formData
+			        });
+
+			        const result = await response.json();
+
+			        if (!response.ok) {
+			            alert(result.message || "Submission failed");
+			            return;
+			        }
+
+					successMessage.style.display = 'block';
+					successMessage.scrollIntoView({ behavior: 'smooth' });
+					alert("KYC completed.");
+					window.location.href = "/dashboard";
+			
+			
+			    } catch (error) {
+			        alert("Unable to submit now. Please try again.");
+			    } finally {
+			        submitBtn.disabled = false;
+			        submitSpinner.style.display = 'none';
+			    }
+			});
+			
+            // Reset form
+            resetBtn.addEventListener('click', function() {
+                if (confirm('Reset the form? All data will be lost.')) {
+                    // Get all input elements
+                    const inputs = document.querySelectorAll('input, select, textarea');
+                    inputs.forEach(input => {
+                        if (input.type !== 'checkbox' && input.type !== 'file') {
+                            input.value = '';
+                        } else if (input.type === 'checkbox') {
+                            input.checked = false;
+                        } else if (input.type === 'file') {
+                            input.value = '';
+                        }
+                    });
+                    
+                    aadharFileName.style.display = 'none';
+                    photoFileName.style.display = 'none';
+                    
+                    // Reset upload areas
+                    aadharUpload.innerHTML = `
+                        <i class="fas fa-file-upload"></i>
+                        <p>Upload Aadhar Card</p>
+                        <div class="info-text">Max 5MB - JPG, PNG, PDF</div>
+                    `;
+                    aadharUpload.style.borderColor = '#d1d5db';
+                    aadharUpload.style.background = '#f8f9fa';
+                    
+                    photoUpload.innerHTML = `
+                        <i class="fas fa-camera"></i>
+                        <p>Upload Your Photo</p>
+                        <div class="info-text">Max 2MB - JPG, PNG</div>
+                    `;
+                    photoUpload.style.borderColor = '#d1d5db';
+                    photoUpload.style.background = '#f8f9fa';
+                    
+                    // Clear errors and validation classes
+                    const errorMessages = document.querySelectorAll('.error-message');
+                    errorMessages.forEach(error => error.style.display = 'none');
+                    
+                    const allInputs = document.querySelectorAll('input, select, textarea');
+                    allInputs.forEach(input => {
+                        input.classList.remove('success', 'error');
+                    });
+                }
+            });
+            
+            // Helper functions
+            function showError(errorId, message) {
+                const errorElement = document.getElementById(errorId);
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                }
+            }
+            
+            function clearError(errorId) {
+                const errorElement = document.getElementById(errorId);
+                if (errorElement) {
+                    errorElement.style.display = 'none';
+                }
+            }
+        });
+    </script>
+    <script src="/js/completionPopperGlobal.js"></script>
+</body>
+</html>
+
+
+
+

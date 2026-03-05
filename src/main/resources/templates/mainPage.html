@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargo Assign Dashboard</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #7c3aed;
+            --background-color: #f5f5f5;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --hover-color: #eef2ff;
+            --shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+        }
+
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
+        /* Top Navigation Bar - Improved Flex Layout */
+        .topbar {
+            height: 60px;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Title on left */
+        .topbar-title {
+            font-weight: 600;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Mobile menu button - hidden on desktop */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        /* Center navigation links */
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+		.notify{
+			cursor:pointer;
+		}
+        .notification-link {
+            position: relative;
+            display: inline-block;
+        }
+        .notification-link.has-unread::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            right: -10px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+            border-bottom: 2px solid white;
+        }
+
+        /* Active / offline */
+        .unit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: auto;
+            height: 28px;
+            padding: 0 0.7rem;
+            background: transparent;
+            border: 1px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.72rem;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+        .unit-btn.active {
+            background: #ffffff;
+            color: var(--primary-color);
+        }
+		       
+        /* Layout */
+        .container {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background: var(--secondary-color);
+            color: white;
+            padding: 1.5rem 0;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+		.profile {
+			text-align: center;
+			padding: 0 1rem 1.5rem;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+			margin-bottom: 1.5rem;
+		}
+		.profile-image {
+			width: 80px;
+			height: 80px;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.1);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin: 0 auto 0.75rem;
+		}
+		.profile-image i {
+			font-size: 2rem;
+			color: rgba(255, 255, 255, 0.7);
+		}
+	
+        .profile p {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+		
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-nav li:hover,
+        .sidebar-nav li.active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .sidebar-nav i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 180px;
+        }
+
+        .card:hover {
+            background: var(--hover-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        a{
+            text-decoration: none;
+            color: white;
+        }
+        .more-menu{
+            display: none;
+        }
+		.toast-notification {
+		    position: fixed;
+		    bottom: 20px;
+		    right: 20px;
+		    background: #4f46e5;
+		    color: #fff;
+		    padding: 12px 20px;
+		    border-radius: 8px;
+		    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+		    z-index: 9999;
+		}
+        .review-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.68);
+            z-index: 10000;
+            padding: 16px;
+        }
+        .review-modal.active {
+            display: flex;
+        }
+        .review-card {
+            width: min(720px, 96vw);
+            background: #fff;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 24px 48px rgba(15, 23, 42, 0.28);
+        }
+        .review-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .review-sub {
+            margin-top: 8px;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+        .stars {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+            font-size: 2.2rem;
+            line-height: 1;
+            user-select: none;
+        }
+        .star {
+            cursor: pointer;
+            color: #cbd5e1;
+            transition: transform 0.15s ease, color 0.15s ease;
+        }
+        .star.active {
+            color: #f59e0b;
+            transform: translateY(-2px);
+        }
+        .review-comment {
+            margin-top: 16px;
+            width: 100%;
+            min-height: 110px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.95rem;
+            resize: vertical;
+        }
+        .review-actions {
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+        }
+        .review-submit-btn {
+            border: none;
+            border-radius: 10px;
+            background: var(--primary-color);
+            color: #fff;
+            padding: 10px 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .unread-corner-arrow {
+            display: none;
+        }
+        .completion-popper {
+            position: fixed;
+            inset: 0;
+            z-index: 10020;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .completion-popper.active {
+            display: flex;
+            background: rgba(15, 23, 42, 0.65);
+        }
+        .completion-core {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            animation: completionPopIn 0.35s ease;
+        }
+        .completion-check {
+            width: 170px;
+            height: 170px;
+            border: 0;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            box-shadow: none;
+        }
+        .completion-check i {
+            font-size: 96px;
+            color: #4f46e5;
+        }
+        .completion-text {
+            background: rgba(15, 23, 42, 0.84);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+        @keyframes completionPopIn {
+            from { transform: scale(0.78); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .completion-confetti {
+            position: absolute;
+            inset: 0;
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 8px;
+            height: 16px;
+            left: var(--sx, 50%);
+            top: var(--sy, 50%);
+            opacity: 0;
+            border-radius: 2px;
+            animation: confettiBurst 900ms ease-out forwards;
+            animation-delay: var(--delay, 0ms);
+            transform: translate(-50%, -50%);
+            background: var(--color, #22d3ee);
+        }
+        @keyframes confettiBurst {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
+            }
+            12% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) rotate(var(--rot, 0deg));
+            }
+        }
+        /* RESPONSIVE DESIGN */
+        /* Tablet View */
+        @media (max-width: 1024px) {
+            .nav-links {
+                gap: 1.5rem;
+            }
+        }
+        /* Mobile View */
+        @media (max-width: 768px) {
+            /* Topbar - Mobile Layout */
+            
+            .topbar {
+                height: auto;
+                min-height: 60px;
+                flex-wrap: wrap;
+                padding: 0.75rem 1rem;
+            }
+            
+            /* Show mobile menu button */
+            .mobile-menu-btn {
+                display: block;
+                order: 1;
+            }
+            
+            /* Title in center */
+            .topbar-title {
+                order: 2;
+                flex: 1;
+                justify-content: center;
+                text-align: center;
+                font-size: 1.1rem;
+            }
+
+            /* Driver status toggle */
+            .unit-toggle {
+                display: inline-flex;
+                position: absolute;
+                top: 50%;
+                right: 3rem;
+                transform: translateY(-50%);
+                width: auto;
+                margin-top: 0;
+                z-index: 1002;
+            }
+            .unit-btn {
+                min-width: 58px;
+                height: 22px;
+                padding: 0 0.45rem;
+                font-size: 0.63rem;
+                text-align: center;
+                line-height: 1;
+            }
+           
+            .more-menu {
+                display: block;
+                position: relative;
+                left:96%;
+                margin-left: 1rem;
+                cursor: pointer;
+            }
+            .more-menu i {
+                font-size: 1.2rem;
+                color: white;
+            }
+
+            /* Dropdown */
+            .more-dropdown {
+                position: absolute;
+                top: 40px;
+                right: 0;
+                background: var(--secondary-color);
+                min-width: 150px;
+                border-radius: 6px;
+                box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+                display: none;
+                flex-direction: column;
+                z-index: 2000;
+            }
+            
+            .more-dropdown a {
+                padding: 10px 15px;
+                text-decoration: none;
+                color: white;
+                font-weight: 500;
+            }
+            .more-dropdown a:hover {
+                background: rgba(255, 255, 255, 0.15)
+            }
+            
+            /* Show dropdown */
+            .more-dropdown.active {
+                display: flex;
+            }            
+            .unread-corner-arrow {
+                position: fixed;
+                right: 12px;
+                top: 50px;
+                z-index: 10030;
+                display: none;
+                color: #f97316;
+                font-size: 60px;
+                line-height: 1;
+                cursor: pointer;
+                user-select: none;
+                text-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+                transform: translate3d(0, 0, 0);
+                will-change: transform, opacity;
+                backface-visibility: hidden;
+                animation: unreadCornerBlink 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            }
+            .unread-corner-arrow.active {
+                display: block;
+            }
+            @keyframes unreadCornerBlink {
+                0% { opacity: 0.45; transform: translate3d(0, 1px, 0); }
+                50% { opacity: 1; transform: translate3d(0, -3px, 0); }
+                100% { opacity: 0.45; transform: translate3d(0, 1px, 0); }
+            }
+            /* Navigation links - hidden by default */
+            .nav-links {
+                position: static;
+                transform: none;
+                order: 4;
+                width: 100%;
+                display: none;
+                justify-content: space-around;
+                margin-top: 0.5rem;
+                padding-top: 0.5rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            /* Sidebar - Hidden by default, overlay style */
+            .sidebar {
+                position: fixed;
+                top:60px;
+                left: 0;
+                height: 100vh;
+                z-index: 999;
+                transform: translateX(-100%);
+                box-shadow: 3px 0 15px rgba(0, 0, 0, 0.2);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            /* Overlay for sidebar */
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 998;
+            }
+            
+            .sidebar-overlay.active {
+                display: block;
+            }
+            
+            /* Adjust main content */
+            .container {
+                flex-direction: column;
+            }
+            
+            .main {
+                padding: 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+                min-height: 150px;
+            }
+        }
+
+        /* Small Mobile */
+        @media (max-width: 480px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .card {
+                min-height: 120px;
+                padding: 1.25rem;
+            }
+            
+            .card-icon {
+                font-size: 2rem;
+            }
+            
+            .card-title {
+                font-size: 1.1rem;
+            }
+            
+            .nav-links {
+                gap: 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .unit-btn {
+                padding: 0.12rem 0.38rem;
+                font-size: 0.58rem;
+            }
+            .unread-corner-arrow {
+                right: 6px;
+                top: 155px;
+                font-size: 30px;
+            }
+            .completion-check {
+                width: 140px;
+                height: 140px;
+            }
+            .completion-check i {
+                font-size: 78px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <header class="topbar">
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Title -->
+        <div class="topbar-title">
+            <i class="fas fa-shipping-fast"></i>
+            <span>Cargo Assign</span>
+        </div>
+        
+        <!-- Navigation Links -->
+        <nav class="nav-links" id="navLinks">
+            <a href="/">Home</a>
+            <a><p onclick="goTo('notificationPage')" class="notify notification-link">Notification</p></a>
+            <a href="/contact">Contact</a>
+        </nav>
+        
+        <!-- More menu (3 dots) -->
+        <div class="more-menu">
+            <i class="fas fa-ellipsis-v" id="moreMenuBtn"></i>
+        
+            <div class="more-dropdown" id="moreDropdown">
+                <a href="/home">Home</a>
+				<a><p onclick="goTo('notificationPage')" class="notification-link">Notification</p></a>
+                <a href="/contact">Contact</a>
+            </div>
+        </div>
+        <!-- status -->
+		<div class="unit-toggle" id="unitToggle">
+		    <button type="button" class="unit-btn active" data-status="ONLINE">ONLINE</button>
+		    <button type="button" class="unit-btn" data-status="OFFLINE">OFFLINE</button>
+		</div>
+
+    </header>
+    <div class="unread-corner-arrow" id="unreadCornerArrow" title="Unread notifications" onclick="goTo('notificationPage')" >&#8593;</div>
+    <div class="completion-popper" id="completionPopper" aria-hidden="true">
+        <div class="completion-core">
+            <div class="completion-check">
+                <i class="fas fa-check" ></i>
+            </div>
+            <div class="completion-text" id="completionPopperText">Cargo delivery completed</div>
+        </div>
+        <div class="completion-confetti" id="completionConfetti"></div>
+    </div>
+
+    <!-- Sidebar Overlay (for mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="profile">
+				<img id="userPhoto" class="profile-image" style="display:none;">
+				<i id="userIcon" class="fas fa-user-circle"></i>
+				
+                <p id="userIdText" ></p>
+                <p id="userRole" ></p>
+                </div>
+<ul class="sidebar-nav">
+				<li id="profilePage"onclick="goTo('profilePage')"><i class="fa-regular fa-address-card"></i>Profile</li>
+				
+								<li onclick="window.location.href='/dashboard'">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+				</li>
+
+                <li id="adminMenuItem" style="display: none;" onclick="window.location.href='/admin'">
+                    <i class="fas fa-user-shield"></i> Admin
+                </li>
+
+                <li onclick="handleKyc()">
+                    <i class="fas fa-id-card"></i> KYC
+                </li>
+                <li onclick="window.location.href='/reports'">
+                    <i class="fas fa-chart-bar"></i> My Reports
+                </li>
+                <li onclick="window.location.href='/payment-invoice'">
+                    <i class="fas fa-file-invoice-dollar"></i>Payment & Invoice
+                </li>
+                <li onclick="window.location.href='/logout'">
+                    <i class="fas fa-sign-out-alt">
+					</i>
+						Logout
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="dashboard-grid" id="dashboard-grid">
+                <div class="card" id="shipperPage" onclick="goTo('shipperPage')">
+                    <div class="card-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <div class="card-title">Shipper</div>
+                </div>
+                <div class="card" id="driverPage" onclick="goTo('driverPage')">
+                    <div class="card-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="card-title">Driver</div>
+                </div>
+                
+                <div class="card" onclick="goTo('driverAvaliable')">
+                    <div class="card-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="card-title">Driver Available</div>
+                </div>
+                
+                
+                <div class="card" onclick="goTo('cargoAvaliable')">
+                    <div class="card-icon">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <div class="card-title">Cargo Available</div>
+                </div>
+                <div class="card" onclick="window.location.href='/tracking'">
+                    <div class="card-icon">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <div class="card-title">Track Cargo</div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <div class="review-modal" id="dashboardReviewModal">
+        <div class="review-card">
+            <h2 class="review-title">Driver Completed Delivery</h2>
+            <p class="review-sub" id="dashboardReviewMeta"></p>
+            <div class="stars" id="dashboardStarsWrap">
+                <span class="star" data-star="1">&#9733;</span>
+                <span class="star" data-star="2">&#9733;</span>
+                <span class="star" data-star="3">&#9733;</span>
+                <span class="star" data-star="4">&#9733;</span>
+                <span class="star" data-star="5">&#9733;</span>
+            </div>
+            <textarea class="review-comment" id="dashboardReviewComment" placeholder="Write your review (optional)"></textarea>
+            <div class="review-actions">
+                <button class="review-submit-btn" id="dashboardSubmitReviewBtn" type="button">Submit Driver Review</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+/* ===============================
+   ELEMENT REFERENCES
+================================ */
+const mobileMenuBtn   = document.getElementById('mobileMenuBtn');
+const sidebar         = document.getElementById('sidebar');
+const sidebarOverlay  = document.getElementById('sidebarOverlay');
+const navLinks        = document.getElementById('navLinks');
+const notificationLinks = document.querySelectorAll('.notification-link');
+const unreadCornerArrow = document.getElementById('unreadCornerArrow');
+const completionPopper = document.getElementById('completionPopper');
+const completionPopperText = document.getElementById('completionPopperText');
+const completionConfetti = document.getElementById('completionConfetti');
+let currentUserRole = null;
+const nearbyCargoPollMs = 100000;
+const nearbyCargoRadiusKm = 25;
+const nearbyCargoHighlightKey = "nearbyCargoHighlightIds";
+const liveTrackingNotifySettingKey = "liveTrackingNotificationEnabled";
+let driverCoords = null;
+let nearbyCargoIntervalId = null;
+let driverLocationWatchId = null;
+let pendingReviewIntervalId = null;
+let reviewModalOpen = false;
+let selectedDashboardStars = 5;
+let currentDashboardReview = null;
+let currentDashboardReviewNotificationId = null;
+let completionPollIntervalId = null;
+let completionBaselineReady = false;
+let completionPopperTimerId = null;
+let completionBurstIntervalId = null;
+const completedDeliverySeenIds = new Set();
+let reviewBaselineReady = false;
+const reviewedDeliverySeenIds = new Set();
+
+
+const shipper = document.getElementById("shipperPage");
+
+const driver = document.getElementById("driverPage");
+
+const statusToggle =document.getElementById("unitToggle");
+const dashboardReviewModal = document.getElementById("dashboardReviewModal");
+const dashboardReviewMeta = document.getElementById("dashboardReviewMeta");
+const dashboardStarsWrap = document.getElementById("dashboardStarsWrap");
+const dashboardReviewComment = document.getElementById("dashboardReviewComment");
+const dashboardSubmitReviewBtn = document.getElementById("dashboardSubmitReviewBtn");
+/* ===============================
+   FUNCTIONS
+================================ */
+const moreMenuBtn = document.getElementById('moreMenuBtn');
+const moreDropdown = document.getElementById('moreDropdown');
+
+async function roleBase() {
+  try {
+    const userRes = await fetch("/api/user/me", {
+      credentials: "include"
+    });
+
+    if (!userRes.ok) return;
+
+    const user = await userRes.json();
+	
+
+    const role = (user.role || "").toUpperCase();
+
+    if (role === "SHIPPER") {
+      driver.style.display = "none";
+	  statusToggle.style.display="none";
+      shipper.style.display = "";
+    } else if (role === "DRIVER") {
+      shipper.style.display = "none";
+	  statusToggle.style.display = "block";
+      driver.style.display = "";
+    } else if (role === "ADMIN") {
+      // Show admin menu for admin users
+      const adminMenuItem = document.getElementById("adminMenuItem");
+      if (adminMenuItem) {
+        adminMenuItem.style.display = "flex";
+      }
+    }
+  } catch (error) {
+    alert("Server error");
+  }
+}
+roleBase();
+
+function toggleMoreMenu() {
+    moreDropdown.classList.toggle('active');
+}
+
+// Open / close on click
+moreMenuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMoreMenu();
+});
+
+// Close when clicking outside
+document.addEventListener('click', () => {
+    moreDropdown.classList.remove('active');
+});
+
+// Toggle sidebar (mobile)
+function toggleSidebar() {
+    sidebar.classList.toggle('active');
+    sidebarOverlay.classList.toggle('active');
+}
+
+// Close sidebar
+function closeSidebar() {
+    sidebar.classList.remove('active');
+    sidebarOverlay.classList.remove('active');
+}
+
+// Handle window resize
+function handleResize() {
+    if (window.innerWidth > 768) {
+        closeSidebar();
+        navLinks.classList.remove('active');
+    }
+}
+
+async function handleKyc() {
+
+  try {
+    const response = await fetch("/api/kyc/status", {
+        credentials: "include"
+    });
+
+    if (response.status === 401) {
+        window.location.href = "/login.html";
+        return;
+    }
+
+    const data = await response.json();
+
+    if (data.kycCompleted) {
+        alert("KYC already completed.");
+        return;
+    }
+
+    const userRes = await fetch("/api/user/me", {
+        credentials: "include"
+    });
+
+    const user = await userRes.json();
+
+    if (user.role === "DRIVER") {
+        window.location.href = "/driver-verification";
+    } else if (user.role === "SHIPPER") {
+        window.location.href = "/shipper-verification";
+    }
+
+  } catch (error) {
+    alert("Server error");
+  }
+}
+
+async function goPostLoadWithKycCheck() {
+    try {
+        const response = await fetch("/api/kyc/status", {
+            credentials: "include"
+        });
+
+        if (response.status === 401) {
+            window.location.href = "/login";
+            return;
+        }
+
+        if (!response.ok) {
+            alert("Unable to verify KYC status");
+            return;
+        }
+
+        const data = await response.json();
+        if (data && data.kycCompleted === true) {
+            window.location.href = "/shipper/post-load";
+            return;
+        }
+
+        alert("Please complete KYC before posting load.");
+        window.location.href = "/shipper-verification?kycRequired=post-load";
+    } catch (error) {
+        alert("Server error");
+    }
+}
+
+// Navigate from dashboard cards
+function loadCSS(href) {
+  document.querySelectorAll(`link[data-base-href="${href}"], link[href="${href}"]`)
+    .forEach(link => link.remove());
+
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = `${href}?v=${Date.now()}`;
+  link.setAttribute("data-base-href", href);
+  document.head.appendChild(link);
+}
+function loadJS(src, callbackName) {
+    const existing = document.querySelector(`script[src="${src}"]`);
+    if (existing) existing.remove();
+
+    const script = document.createElement("script");
+    script.src = src;
+    script.defer = true;
+
+    script.onload = function () {
+        if (callbackName && typeof window[callbackName] === "function") {
+            window[callbackName]();
+        }
+    };
+
+    document.body.appendChild(script);
+}
+
+function initShipperPage() {
+  const page = document.querySelector(".shipperPage");
+  if (!page) return; // 👈 THIS LINE IS KEY
+}
+
+function normalizeTripIdFromNotification(n) {
+    if (!n || n.entityId == null) return null;
+    return `LD-${String(n.entityId).trim()}`;
+}
+
+async function fetchPendingReviewItem(tripId) {
+    const res = await fetch("/api/payment-invoices", { credentials: "include" });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data || !Array.isArray(data.invoices)) return null;
+    return data.invoices.find(i => i && i.tripId === tripId && i.canReview === true) || null;
+}
+
+async function fetchFirstPendingReviewItem() {
+    const res = await fetch("/api/payment-invoices", { credentials: "include" });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data || !Array.isArray(data.invoices)) return null;
+    return data.invoices.find(i => i && i.canReview === true) || null;
+}
+
+function paintDashboardStars(value) {
+    selectedDashboardStars = value;
+    dashboardStarsWrap.querySelectorAll(".star").forEach(star => {
+        const level = Number(star.dataset.star);
+        star.classList.toggle("active", level <= value);
+    });
+}
+
+function openDashboardReviewModalForItem(reviewItem, notificationId) {
+    if (reviewModalOpen || !reviewItem) return;
+    currentDashboardReview = reviewItem;
+    currentDashboardReviewNotificationId = notificationId ?? null;
+    dashboardReviewMeta.textContent =
+        `Trip: ${reviewItem.tripId || "-"} | Driver: ${reviewItem.driverName || "-"} (${reviewItem.driverId || "-"})`;
+    dashboardReviewComment.value = "";
+    paintDashboardStars(5);
+    dashboardReviewModal.classList.add("active");
+    reviewModalOpen = true;
+}
+
+async function openDashboardReviewModalFromNotification(notification) {
+    if (reviewModalOpen || !notification) return;
+    const tripId = normalizeTripIdFromNotification(notification);
+    if (!tripId) return;
+
+    const reviewItem = await fetchPendingReviewItem(tripId);
+    if (!reviewItem) return;
+    openDashboardReviewModalForItem(reviewItem, notification.id ?? null);
+}
+
+async function openDashboardReviewModalOnLogin() {
+    if (reviewModalOpen || (currentUserRole || "").toUpperCase() !== "SHIPPER") return;
+    const firstPending = await fetchFirstPendingReviewItem();
+    if (firstPending) {
+        openDashboardReviewModalForItem(firstPending, null);
+    }
+}
+
+async function submitDashboardDriverReview() {
+    if (!currentDashboardReview) return;
+    try {
+        const res = await fetch(`/api/payment-invoices/${encodeURIComponent(currentDashboardReview.tripId)}/review-driver`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                rating: selectedDashboardStars,
+                reviewComment: dashboardReviewComment.value || ""
+            })
+        });
+
+        if (res.status === 401) {
+            window.location.href = "/login";
+            return;
+        }
+
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            alert(payload.message || "Unable to submit review.");
+            return;
+        }
+
+        dashboardReviewModal.classList.remove("active");
+        reviewModalOpen = false;
+        currentDashboardReview = null;
+        if (currentDashboardReviewNotificationId != null) {
+            fetch(`/api/notifications/${currentDashboardReviewNotificationId}/read`, {
+                method: "POST",
+                credentials: "include"
+            }).catch(() => {});
+        }
+        currentDashboardReviewNotificationId = null;
+        alert("Driver review submitted.");
+        await updateNotificationIndicator();
+    } catch (err) {
+        alert("Unable to submit review.");
+    }
+}
+
+async function updateNotificationIndicator() {
+    try {
+        const res = await fetch("/api/notifications", { credentials: "include" });
+
+        if (res.status === 401) return;
+        if (!res.ok) return;
+
+        const notifications = await res.json();
+        const hasUnread = Array.isArray(notifications) &&
+            notifications.some(n => n && n.read === false);
+
+        notificationLinks.forEach(link => {
+            link.classList.toggle("has-unread", hasUnread);
+        });
+        if (unreadCornerArrow) {
+            unreadCornerArrow.classList.toggle("active", hasUnread);
+        }
+
+        if ((currentUserRole || "").toUpperCase() === "SHIPPER" && Array.isArray(notifications)) {
+            const unreadDriverRequest = notifications.find(n =>
+                n && n.read === false &&
+                (n.type === "DRIVER_REQUEST" ||
+                 (typeof n.message === "string" &&
+                  n.message.toLowerCase().includes("driver requested")))
+            );
+
+            if (unreadDriverRequest && unreadDriverRequest.id != null) {
+                const key = "lastShipperDriverRequestAlertId";
+                const currentId = String(unreadDriverRequest.id);
+                const lastAlertId = sessionStorage.getItem(key);
+
+                if (lastAlertId !== currentId) {
+                    alert("Driver sent an approval request for your load.");
+                    sessionStorage.setItem(key, currentId);
+                }
+            }
+
+            const unreadReviewRequired = notifications.find(n =>
+                n && n.read === false && n.type === "REVIEW_REQUIRED"
+            );
+
+            if (unreadReviewRequired && unreadReviewRequired.id != null) {
+                const key = "lastShipperReviewPromptId";
+                const currentId = String(unreadReviewRequired.id);
+                const lastPromptId = sessionStorage.getItem(key);
+
+                if (lastPromptId !== currentId) {
+                    sessionStorage.setItem(key, currentId);
+                    openDashboardReviewModalFromNotification(unreadReviewRequired);
+                }
+            }
+        }
+
+        if ((currentUserRole || "").toUpperCase() === "DRIVER" && Array.isArray(notifications)) {
+            const unreadApprovedNotice = notifications.find(n =>
+                n && n.read === false &&
+                (
+                    (n.type || "").toUpperCase() === "LOAD_APPROVED" ||
+                    (typeof n.message === "string" &&
+                        n.message.toLowerCase().includes("accepted your request"))
+                )
+            );
+
+            if (unreadApprovedNotice && unreadApprovedNotice.id != null) {
+                const key = "lastDriverLoadApprovedAlertId";
+                const currentId = String(unreadApprovedNotice.id);
+                const lastAlertId = sessionStorage.getItem(key);
+
+                if (lastAlertId !== currentId) {
+                    alert("Shipper approved your cargo request. You can start the trip now.");
+                    sessionStorage.setItem(key, currentId);
+                }
+            }
+
+            const unreadCancelNotice = notifications.find(n =>
+                n && n.read === false &&
+                (
+                    (n.type || "").toUpperCase() === "APPROVAL_CANCELLED" ||
+                    (typeof n.message === "string" &&
+                        n.message.toLowerCase().includes("cancel"))
+                )
+            );
+
+            if (unreadCancelNotice && unreadCancelNotice.id != null) {
+                const key = "lastDriverCancelAlertId";
+                const currentId = String(unreadCancelNotice.id);
+                const lastAlertId = sessionStorage.getItem(key);
+
+                if (lastAlertId !== currentId) {
+                    alert("Shipper cancelled your cargo approval request.");
+                    sessionStorage.setItem(key, currentId);
+                }
+            }
+        }
+    } catch (err) {
+    }
+}
+
+function appendConfettiBurst(originXPercent, originYPercent, count, maxDistance, baseDelayMs) {
+    if (!completionConfetti) return;
+    const colors = ["#4f46e5", "#22d3ee", "#f59e0b", "#a78bfa", "#10b981", "#ef4444"];
+    for (let i = 0; i < count; i++) {
+        const piece = document.createElement("span");
+        piece.className = "confetti-piece";
+        const angle = (Math.PI * 2 * i) / count;
+        const jitter = (Math.random() - 0.5) * 0.8;
+        const distance = 70 + Math.random() * maxDistance;
+        const dx = Math.cos(angle + jitter) * distance;
+        const dy = Math.sin(angle + jitter) * distance;
+        const rotate = Math.floor(Math.random() * 520) - 260;
+        const delay = baseDelayMs + Math.floor(Math.random() * 200);
+        piece.style.setProperty("--sx", `${originXPercent}%`);
+        piece.style.setProperty("--sy", `${originYPercent}%`);
+        piece.style.setProperty("--dx", `${dx.toFixed(1)}px`);
+        piece.style.setProperty("--dy", `${dy.toFixed(1)}px`);
+        piece.style.setProperty("--rot", `${rotate}deg`);
+        piece.style.setProperty("--delay", `${delay}ms`);
+        piece.style.setProperty("--color", colors[i % colors.length]);
+        completionConfetti.appendChild(piece);
+    }
+}
+
+function renderCompletionConfetti() {
+    if (!completionConfetti) return;
+    completionConfetti.innerHTML = "";
+    // Center burst + side bursts for full-page popper feel.
+    appendConfettiBurst(50, 50, 56, 210, 0);
+    appendConfettiBurst(12, 22, 24, 170, 60);
+    appendConfettiBurst(88, 22, 24, 170, 60);
+    appendConfettiBurst(12, 78, 24, 170, 90);
+    appendConfettiBurst(88, 78, 24, 170, 90);
+    appendConfettiBurst(50, 15, 22, 160, 40);
+    appendConfettiBurst(50, 85, 22, 160, 40);
+}
+
+function showCompletionPopper(message) {
+    if (!completionPopper || !completionPopperText) return;
+    completionPopperText.textContent = message || "Cargo delivery completed";
+    renderCompletionConfetti();
+    completionPopper.classList.add("active");
+    if (completionPopperTimerId) clearTimeout(completionPopperTimerId);
+    if (completionBurstIntervalId) clearInterval(completionBurstIntervalId);
+    completionBurstIntervalId = setInterval(() => {
+        if (!completionConfetti) return;
+        appendConfettiBurst(8 + Math.random() * 84, 10 + Math.random() * 80, 22, 160, 0);
+    }, 650);
+    completionPopperTimerId = setTimeout(() => {
+        completionPopper.classList.remove("active");
+        if (completionBurstIntervalId) {
+            clearInterval(completionBurstIntervalId);
+            completionBurstIntervalId = null;
+        }
+        if (completionConfetti) completionConfetti.innerHTML = "";
+    }, 5000);
+}
+
+async function monitorCompletedDeliveryCelebration() {
+    const role = (currentUserRole || "").toUpperCase();
+    if (role !== "SHIPPER" && role !== "DRIVER") return;
+    try {
+        const res = await fetch("/api/tracking/cargos", { credentials: "include" });
+        if (res.status === 401 || !res.ok) return;
+        const loads = await res.json();
+        if (!Array.isArray(loads)) return;
+
+        const completedIds = loads
+            .filter(load => load && String(load.status || "").toUpperCase() === "COMPLETED")
+            .map(load => String(load.loadId || "").trim())
+            .filter(Boolean);
+
+        if (!completionBaselineReady) {
+            completedIds.forEach(id => completedDeliverySeenIds.add(id));
+            completionBaselineReady = true;
+            return;
+        }
+
+        const newCompleted = completedIds.filter(id => !completedDeliverySeenIds.has(id));
+        if (newCompleted.length > 0) {
+            newCompleted.forEach(id => completedDeliverySeenIds.add(id));
+            const msg = newCompleted.length === 1
+                ? `Delivery completed: ${newCompleted[0]}`
+                : `${newCompleted.length} cargo deliveries completed`;
+            showCompletionPopper(msg);
+        }
+    } catch (err) {
+    }
+}
+
+async function monitorDriverReviewedCelebration() {
+    const role = (currentUserRole || "").toUpperCase();
+    if (role !== "DRIVER") return;
+    try {
+        const res = await fetch("/api/payment-invoices", { credentials: "include" });
+        if (res.status === 401 || !res.ok) return;
+        const payload = await res.json();
+        const invoices = Array.isArray(payload)
+            ? payload
+            : (payload && Array.isArray(payload.invoices) ? payload.invoices : []);
+
+        const reviewedTripIds = invoices
+            .filter(item => {
+                if (!item) return false;
+                const rating = Number(item.driverReviewRating);
+                const hasReview = (Number.isFinite(rating) && rating > 0) || !!item.driverReviewedAt;
+                const statusRaw = String(item.cargoStatus || item.status || "").toUpperCase();
+                const isCompleted =
+                    statusRaw.includes("COMPLETE") ||
+                    statusRaw.includes("DELIVER") ||
+                    statusRaw.includes("CLOSE") ||
+                    statusRaw.includes("FINISH");
+                return hasReview && isCompleted;
+            })
+            .map(item => String(item.tripId || "").trim())
+            .filter(Boolean);
+
+        if (!reviewBaselineReady) {
+            reviewedTripIds.forEach(id => reviewedDeliverySeenIds.add(id));
+            reviewBaselineReady = true;
+            return;
+        }
+
+        const newReviewedTrips = reviewedTripIds.filter(id => !reviewedDeliverySeenIds.has(id));
+        if (newReviewedTrips.length > 0) {
+            newReviewedTrips.forEach(id => reviewedDeliverySeenIds.add(id));
+            const msg = newReviewedTrips.length === 1
+                ? `Review completed by shipper: ${newReviewedTrips[0]}`
+                : `${newReviewedTrips.length} completed cargos reviewed by shipper`;
+            showCompletionPopper(msg);
+        }
+    } catch (err) {
+    }
+}
+
+function isDriverOnline() {
+    const activeStatusBtn = document.querySelector(".unit-btn.active");
+    return activeStatusBtn && activeStatusBtn.dataset.status === "ONLINE";
+}
+
+function setDriverStatusToggle(statusRaw) {
+    const normalized = String(statusRaw || "").toUpperCase();
+    // FREE/WORKING are effectively online states for current toggle design.
+    const targetStatus = (normalized === "OFFLINE") ? "OFFLINE" : "ONLINE";
+    const statusButtons = document.querySelectorAll(".unit-btn");
+    statusButtons.forEach(b => {
+        b.classList.toggle("active", b.dataset.status === targetStatus);
+    });
+}
+
+async function syncDriverStatusToggle() {
+    if ((currentUserRole || "").toUpperCase() !== "DRIVER") return;
+    try {
+        const response = await fetch("/api/drivers/user/status", {
+            credentials: "include"
+        });
+        if (response.status === 401 || !response.ok) return;
+        const payload = await response.json().catch(() => ({}));
+        setDriverStatusToggle(payload.status);
+    } catch (error) {
+    }
+}
+
+function isLiveTrackingNotificationEnabled() {
+    const saved = localStorage.getItem(liveTrackingNotifySettingKey);
+    return saved === "true";
+}
+
+function applyDriverLiveTrackingPreference() {
+    if ((currentUserRole || "").toUpperCase() !== "DRIVER") return;
+
+    if (!isLiveTrackingNotificationEnabled()) {
+        stopDriverLiveLocationTracking();
+        if (nearbyCargoIntervalId != null) {
+            clearInterval(nearbyCargoIntervalId);
+            nearbyCargoIntervalId = null;
+        }
+        return;
+    }
+
+    if (isDriverOnline()) {
+        startDriverLiveLocationTracking();
+    }
+    if (nearbyCargoIntervalId == null) {
+        nearbyCargoIntervalId = setInterval(checkNearbyCargoAvailability, nearbyCargoPollMs);
+    }
+}
+
+function openNearbyCargoPage(loadIds) {
+    if (Array.isArray(loadIds) && loadIds.length > 0) {
+        const ids = loadIds.map(id => String(id));
+        sessionStorage.setItem(nearbyCargoHighlightKey, JSON.stringify(ids));
+    }
+    goTo("cargoAvaliable");
+}
+
+function showToast(message, onClick) {
+    const toast = document.createElement("div");
+    toast.className = "toast-notification";
+    toast.textContent = message;
+    if (typeof onClick === "function") {
+        toast.style.cursor = "pointer";
+        toast.title = "Click to view cargo";
+        toast.addEventListener("click", () => {
+            onClick();
+            toast.remove();
+        });
+    }
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 4500);
+}
+
+function haversineDistanceKm(lat1, lon1, lat2, lon2) {
+    const toRad = deg => (deg * Math.PI) / 180;
+    const R = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) *
+            Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+async function setDriverLocation() {
+    if (!navigator.geolocation) return;
+    return new Promise(resolve => {
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                driverCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                resolve(driverCoords);
+            },
+            () => resolve(null),
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 }
+        );
+    });
+}
+
+function startDriverLiveLocationTracking() {
+    if (!navigator.geolocation || driverLocationWatchId !== null) return;
+
+    driverLocationWatchId = navigator.geolocation.watchPosition(
+        pos => {
+            driverCoords = {
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude
+            };
+        },
+        err => {
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 3000 }
+    );
+}
+
+function stopDriverLiveLocationTracking() {
+    if (!navigator.geolocation || driverLocationWatchId === null) return;
+    navigator.geolocation.clearWatch(driverLocationWatchId);
+    driverLocationWatchId = null;
+}
+
+async function checkNearbyCargoAvailability() {
+    if (currentUserRole !== "DRIVER" || !isDriverOnline() || !isLiveTrackingNotificationEnabled()) {
+        return;
+    }
+
+    if (!driverCoords) {
+        await setDriverLocation();
+        if (!driverCoords) return;
+    }
+
+    try {
+        const res = await fetch("/api/cargo-available", { credentials: "include" });
+        if (res.status === 401 || res.status === 204 || !res.ok) return;
+
+        const loads = await res.json();
+        if (!Array.isArray(loads) || loads.length === 0) return;
+
+        const newNearbyLoads = loads.filter(load => {
+            if (!load) return false;
+            if (typeof load.pickupLat !== "number" || typeof load.pickupLng !== "number") return false;
+
+            const distance = haversineDistanceKm(
+                driverCoords.lat,
+                driverCoords.lng,
+                load.pickupLat,
+                load.pickupLng
+            );
+
+            return distance <= nearbyCargoRadiusKm;
+        });
+
+        if (newNearbyLoads.length === 0) return;
+
+        const firstLoad = newNearbyLoads[0];
+        const message = newNearbyLoads.length === 1
+            ? `Nearby cargo available: ${firstLoad.pickupLocation || "Pickup location"}`
+            : `${newNearbyLoads.length} nearby cargos available`;
+        const nearbyLoadIds = newNearbyLoads
+            .map(load => load && load.loadId)
+            .filter(id => id != null);
+
+        if (!isLiveTrackingNotificationEnabled()) return;
+        showToast(message, () => openNearbyCargoPage(nearbyLoadIds));
+
+        if (!isLiveTrackingNotificationEnabled()) return;
+        if ("Notification" in window && Notification.permission === "granted") {
+            const push = new Notification("Cargo Assign", { body: message });
+            push.onclick = () => {
+                window.focus();
+                openNearbyCargoPage(nearbyLoadIds);
+                push.close();
+            };
+        } else if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    const push = new Notification("Cargo Assign", { body: message });
+                    push.onclick = () => {
+                        window.focus();
+                        openNearbyCargoPage(nearbyLoadIds);
+                        push.close();
+                    };
+                }
+            });
+        }
+    } catch (err) {
+    }
+}
+
+function goTo(page) {
+  fetch(`pages/${page}.html`)
+    .then(res => res.text())
+    .then(html => {
+      const dashboardGrid = document.getElementById("dashboard-grid");
+      dashboardGrid.classList.remove("cargo-layout");
+      if (page === "cargoAvaliable") {
+        dashboardGrid.classList.add("cargo-layout");
+      }
+      dashboardGrid.innerHTML = html;
+
+      if (page === "profilePage") {
+        loadCSS("css/profilePage.css");   // ✅ correct name
+        loadJS("js/profilePage.js","initProfilePage");  // ✅ force JS execution
+		
+      }
+
+      if (page === "shipperPage") {
+        loadCSS("css/shipperPage.css");
+        initShipperPage();
+      }
+	  if (page === "driverAvaliable") {
+	    loadCSS("css/driverAvaliable.css");
+	    loadJS("js/driverAvaliable.js", "initDriverAvailablePage");
+	  }
+	  if (page === "cargoAvaliable") {
+	    loadCSS("css/cargoAvaliable.css");
+	    loadJS("js/cargoAvaliable.js", "initCargoAvailablePage");
+	  }
+
+      if (page === "driverPage") {
+        loadCSS("css/driverPage.css");
+      }
+	  if (page === "notificationPage") {
+	      loadCSS("css/notificationPage.css");
+	      loadJS("js/notificationPage.js", "initNotificationPage");
+	  }
+      if (page === "creditsReviewPage") {
+          loadCSS("css/creditsReviewPage.css");
+          loadJS("js/creditsReviewPage.js", "initCreditsReviewPage");
+      }
+
+    });
+}
+
+
+/* ===============================
+   EVENT LISTENERS
+================================ */
+
+mobileMenuBtn.addEventListener('click', toggleSidebar);
+sidebarOverlay.addEventListener('click', closeSidebar);
+window.addEventListener('resize', handleResize);
+
+// Sidebar active state
+document.querySelectorAll('.sidebar-nav li').forEach(item => {
+    item.addEventListener('click', function () {
+        document.querySelectorAll('.sidebar-nav li')
+            .forEach(li => li.classList.remove('active'));
+        this.classList.add('active');
+        if (window.innerWidth <= 768) closeSidebar();
+    });
+});
+document.addEventListener("DOMContentLoaded", async () => {
+    if (localStorage.getItem(liveTrackingNotifySettingKey) === null) {
+        localStorage.setItem(liveTrackingNotifySettingKey, "false");
+    }
+    // Fetch user
+    try {
+        const res = await fetch("/api/user/me", { credentials: "include" });
+        if (res.status === 401) return window.location.href = "/login";
+        const user = await res.json();
+        currentUserRole = user.role || null;
+
+        document.getElementById("userIdText").textContent = "User ID: " + (user.userId || "-");
+        document.getElementById("userRole").textContent = "Role: " + (user.role || "-");
+
+        const img = document.getElementById("userPhoto");
+        const icon = document.getElementById("userIcon");
+
+        if (user.profilePhoto) {
+            img.src = user.profilePhoto + "?t=" + Date.now();
+            img.style.display = "block";
+            icon.style.display = "none";
+        } else {
+            img.style.display = "none";
+            icon.style.display = "block";
+        }
+
+        await updateNotificationIndicator();
+        if ((currentUserRole || "").toUpperCase() === "SHIPPER") {
+            await openDashboardReviewModalOnLogin();
+            if (pendingReviewIntervalId == null) {
+                pendingReviewIntervalId = setInterval(openDashboardReviewModalOnLogin, 20000);
+            }
+        }
+        setInterval(updateNotificationIndicator, 15000);
+        if ((currentUserRole || "").toUpperCase() === "DRIVER") {
+            await syncDriverStatusToggle();
+            applyDriverLiveTrackingPreference();
+            if (isLiveTrackingNotificationEnabled()) {
+                await setDriverLocation();
+                await checkNearbyCargoAvailability();
+            }
+        }
+        await monitorCompletedDeliveryCelebration();
+        await monitorDriverReviewedCelebration();
+        if (completionPollIntervalId == null) {
+            completionPollIntervalId = setInterval(() => {
+                monitorCompletedDeliveryCelebration();
+                monitorDriverReviewedCelebration();
+            }, 15000);
+        }
+    } catch (err) {
+    }
+
+});
+document.querySelectorAll(".unit-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+
+        const selectedStatus = btn.dataset.status;
+
+        try {
+            const response = await fetch("/api/drivers/user/status", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    status: selectedStatus
+                })
+            });
+
+            if (!response.ok) {
+                let message = "Failed to update status";
+                try {
+                    const contentType = response.headers.get("content-type") || "";
+                    if (contentType.includes("application/json")) {
+                        const payload = await response.json();
+                        if (payload && payload.message) message = payload.message;
+                    } else {
+                        const text = await response.text();
+                        if (text) message = text;
+                    }
+                } catch (_) {}
+                alert(message);
+                return;
+            }
+
+            // Update UI immediately using selectedStatus
+            document.querySelectorAll(".unit-btn")
+                .forEach(b => b.classList.remove("active"));
+
+            btn.classList.add("active");
+			
+			if (selectedStatus === "ONLINE") {
+                applyDriverLiveTrackingPreference();
+                if (isLiveTrackingNotificationEnabled()) {
+                    checkNearbyCargoAvailability();
+                    alert("You are switching to online");
+                } else {
+                    alert("You are online, but live tracking notification is OFF in profile.");
+                }
+			} else if (selectedStatus === "OFFLINE") {
+                stopDriverLiveLocationTracking();
+                if (nearbyCargoIntervalId != null) {
+                    clearInterval(nearbyCargoIntervalId);
+                    nearbyCargoIntervalId = null;
+                }
+                alert("You are switching to offline");
+			}
+
+        } catch (error) {
+            alert("Server error");
+        }
+    });
+});
+
+window.addEventListener("storage", event => {
+    if (event.key !== liveTrackingNotifySettingKey) return;
+    applyDriverLiveTrackingPreference();
+});
+window.addEventListener("liveTrackingNotificationPreferenceChanged", () => {
+    applyDriverLiveTrackingPreference();
+});
+window.addEventListener("pageshow", () => {
+    syncDriverStatusToggle();
+    applyDriverLiveTrackingPreference();
+});
+
+dashboardSubmitReviewBtn.addEventListener("click", submitDashboardDriverReview);
+dashboardStarsWrap.addEventListener("click", (event) => {
+    const star = event.target.closest(".star");
+    if (!star) return;
+    paintDashboardStars(Number(star.dataset.star));
+});
+
+</script>
+
+<!-- Global Completion & KYC Notification Popper -->
+<script src="/js/completionPopperGlobal.js"></script>
+
+</body>
+</html>

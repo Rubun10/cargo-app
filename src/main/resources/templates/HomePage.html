@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargo Assign</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+        }
+        
+        .Home_page {
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Navigation Bar */
+        .navBar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .title h2 {
+            color: #ac3333;
+            font-size: 1.8rem;
+        }
+        
+        .navBar ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navBar ul li a {
+            cursor: pointer;
+            color: #555;
+            font-weight: 500;
+            padding: 8px 0;
+            transition: color 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+        }
+        
+        .navBar ul li a:hover {
+            color: #007bff;
+        }
+        
+        /* Hide the pipe characters on mobile */
+        .navBar ul li::after {
+            content: "|";
+            margin-left: 20px;
+            color: #ddd;
+        }
+        
+        .navBar ul li a:last-child::after {
+            content: "";
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 80px);
+            overflow: hidden;
+        }
+        
+        .background-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Overlay for better text readability */
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.3));
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+        }
+        
+        .hero-content {
+            max-width: 600px;
+            color: white;
+        }
+        
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .mobile-menu-btn span {
+            width: 25px;
+            height: 3px;
+            background-color: #333;
+            transition: 0.3s;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .hero-content h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero-content p {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navBar {
+                padding: 15px 20px;
+            }
+            
+            .navBar ul {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                gap: 0;
+                padding: 20px 0;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            }
+            
+            .navBar ul.active {
+                display: flex;
+            }
+            
+            .navBar ul li {
+                color: white;
+                width: 100%;
+                text-align: center;
+                padding: 15px 0;
+                border-bottom: 1px solid #eee;
+                margin: 0;
+            }
+            .navBar ul li a {
+                color: #555;
+                display: block;
+            }
+            
+            .navBar ul li::after {
+                content: "";
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: flex;
+            }
+            
+            .hero-content h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero-content p {
+                font-size: 1rem;
+            }
+            
+            .cta-button {
+                padding: 12px 30px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .title h2 {
+                font-size: 1.5rem;
+            }
+            
+            .hero-content h1 {
+                font-size: 1.8rem;
+            }
+            
+            .hero-content p {
+                font-size: 0.9rem;
+            }
+            
+            .hero-overlay {
+                padding: 0 20px;
+            }
+            
+            .cta-button {
+                padding: 10px 25px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* Laptop-specific optimizations */
+        @media (min-width: 769px) {
+            .navBar {
+                padding: 25px 8%;
+            }
+            
+            .title h2 {
+                font-size: 2rem;
+            }
+            
+            .navBar ul li {
+                font-size: 1.1rem;
+                padding: 10px 0;
+            }
+            
+            .hero-content h1 {
+                font-size: 4rem;
+            }
+            
+            .hero-content p {
+                font-size: 1.3rem;
+            }
+        }
+        
+        /* Animation for mobile menu */
+        @media (max-width: 768px) {
+            .mobile-menu-btn.active span:nth-child(1) {
+                transform: rotate(45deg) translate(6px, 6px);
+            }
+            
+            .mobile-menu-btn.active span:nth-child(2) {
+                opacity: 0;
+            }
+            
+            .mobile-menu-btn.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(6px, -6px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="Home_page">
+        <div class="navBar">
+            <div class="title"><h2>Cargo Assign</h2></div>
+            
+            <div class="mobile-menu-btn" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <ul id="navMenu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/register">Register</a></li>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/contact">Contact Us</a></li>
+            </ul>
+        </div>
+        
+        <div class="hero-section">
+            <img src="/images/home page.jpg" alt="Cargo Transport Background" class="background-img">
+            <div class="hero-overlay">
+                <div class="hero-content">
+                    <h1>Efficient Cargo Management Solutions</h1>
+                    <p>Streamline your logistics operations with our advanced cargo assignment platform. Track, manage, and optimize your shipments in real-time.</p>
+                    <a href="/login" class="cta-button">Get Started</a>
+                </div>
+            </div>
+        </div>
+		<div  class="">
+			</div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            navMenu.classList.toggle('active');
+            menuBtn.classList.toggle('active');
+        }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navMenu = document.getElementById('navMenu');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            const navBar = document.querySelector('.navBar');
+            
+            if (window.innerWidth <= 768) {
+                if (!navBar.contains(event.target) && navMenu.classList.contains('active')) {
+                    navMenu.classList.remove('active');
+                    menuBtn.classList.remove('active');
+                }
+            }
+        });
+        
+        // Close menu when clicking on a menu item
+        document.querySelectorAll('.navBar ul li').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    const navMenu = document.getElementById('navMenu');
+                    const menuBtn = document.querySelector('.mobile-menu-btn');
+                    navMenu.classList.remove('active');
+                    menuBtn.classList.remove('active');
+                }
+            });
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const navMenu = document.getElementById('navMenu');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (window.innerWidth > 768) {
+                navMenu.classList.remove('active');
+                menuBtn.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

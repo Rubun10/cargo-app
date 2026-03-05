@@ -1,0 +1,13 @@
+package com.example.CargoAssign.Model;
+
+public enum LoadStatus {
+	AVAILABLE,
+	POSTED,
+	CONFIRM,
+	ACTIVE,
+	DRIVER_ACCEPTED,
+	DRIVER_REQUESTED,
+	SHIPPER_CONFIRMED,
+	COMPLETED, PENDING,APPROVEL
+}
+

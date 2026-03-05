@@ -1,0 +1,37 @@
+<div class="driver-container">
+    <div class="app-header">
+        <h1>Drivers Available</h1>
+
+        <div class="filters">
+            <button onclick="filterStatus('ALL')">All</button>
+            <button onclick="filterStatus('WORKING')">Working</button>
+            <button onclick="filterStatus('FREE')">Free</button>
+        </div>
+    </div>
+
+    <input
+        type="text"
+        id="search"
+        placeholder="Search by name, phone, vehicle type, or location"
+        onkeyup="searchDrivers()"
+    />
+
+    <table>
+        <thead>
+            <tr>
+                <th>Profile</th>
+                <th>Driver Details</th>
+                <th>Rating</th>
+                <th>Status</th>
+                <th>Vehicle</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="driverTable">
+
+		</tbody>
+			
+    </table>
+</div>
+

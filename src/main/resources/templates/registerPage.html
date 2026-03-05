@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cargo Assign - Registration</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f4f7fb;
+    }
+
+    .container {
+      width: 380px;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 26px;
+      font-weight: bold;
+      color: #1e40af;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #111827;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 5px;
+      color: #374151;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 40px 10px 10px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+    }
+
+    .error-text {
+      color: #ef4444;
+      font-size: 12px;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .eye {
+      position: absolute;
+      right: 12px;
+      top: 30px;
+      cursor: pointer;
+      font-size: 18px;
+      color: #6b7280;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: black;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .link {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .link a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="logo">Cargo Assign</div>
+  <h2>Register</h2>
+
+  <form id="registerForm">
+
+    <div class="form-group">
+      <label>Role</label>
+      <select name="role">
+        <option value="">Select Role</option>
+        <option value="DRIVER">DRIVER</option>
+        <option value="SHIPPER">SHIPPER</option>
+      </select>
+      <div class="error-text" id="roleError">Please select a role</div>
+    </div>
+
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" name="name" placeholder="Enter Name"/>
+      <div class="error-text" id="nameError">Name is required</div>
+    </div>
+
+    <div class="form-group">
+      <label>Mobile</label>
+      <input type="tel" name="mobile" placeholder="Enter Mobile Number" />
+      <div class="error-text" id="mobileError">Enter valid 10-digit mobile number</div>
+    </div>
+
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" name="email" placeholder="Enter Email" />
+      <div class="error-text" id="emailError">Enter valid email</div>
+    </div>
+	
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" name="password" id="password" placeholder="Create Password" />
+      <i class="fa-solid fa-eye eye" onclick="togglePassword('password',this)"></i>
+      <div class="error-text" id="passwordError">Min 8 chars, 1 letter & 1 number</div>
+    </div>
+    <div class="form-group">
+      <label>Confirm Password</label>
+      <input type="password" name="confirm" id="confirmPassword" placeholder="Confirm Password" />
+      <i class="fa-solid fa-eye eye" onclick="togglePassword('confirmPassword',this)"></i>
+      <div class="error-text" id="confirmError">Passwords do not match</div>
+    </div>
+
+    <button type="submit" id="registerBtn">Register</button>
+
+    <div class="link">
+      Already have an account?
+      <a href="/login">Login</a>
+    </div>
+
+  </form>
+</div>
+
+<script>
+	
+	const registerBtn=document.getElementById("registerBtn");
+	registerBtn.textContent="Register";
+function togglePassword(id, icon) {
+  const input = document.getElementById(id);
+  input.type = input.type === "password" ? "text" : "password";
+  icon.classList.toggle("fa-eye");
+  icon.classList.toggle("fa-eye-slash");
+}
+
+document.getElementById("registerForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  // Hide all errors
+  document.querySelectorAll(".error-text").forEach(el => {
+    el.style.display = "none";
+  });
+
+  const role = this.role.value;
+  const name = this.name.value.trim();
+  const mobile = this.mobile.value.trim();
+  const email = this.email.value.trim();
+  const password = this.password.value;
+  const confirm = this.confirm.value;
+
+  let valid = true;
+
+  if (!role) {
+    roleError.style.display = "block";
+    valid = false;
+  }
+
+  if (!name) {
+    nameError.style.display = "block";
+    valid = false;
+  }
+
+  if (!/^\d{10}$/.test(mobile)) {
+    mobileError.style.display = "block";
+    valid = false;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    emailError.style.display = "block";
+    valid = false;
+  }
+
+  if (!/(?=.*[A-Za-z])(?=.*\d).{8,}/.test(password)) {
+    passwordError.style.display = "block";
+    valid = false;
+  }
+
+  if (password !== confirm) {
+    confirmError.style.display = "block";
+    valid = false;
+  }
+
+  if (!valid) return;
+  
+  const registerBtn = document.getElementById("registerBtn");
+        const originalText = registerBtn.textContent;
+        registerBtn.textContent = "Registering...";
+        registerBtn.disabled = true;
+  // submit to backend
+  fetch("/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ role, name, mobile, email, password})
+  })
+  .then(async response => {
+      const result = await response.json();
+
+      if (!response.ok) {
+          alert(result.message || "Registration failed");
+		location.reload();
+          return;
+      }
+
+      alert(result.message);
+      window.location.href = "/login";
+  })
+
+  .catch(() => alert("Something went wrong. Please try again."));
+});
+</script>
+
+</body>
+</html>
+

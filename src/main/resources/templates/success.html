@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Success - Cargo Assign</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f4f7fb;
+      margin: 0;
+    }
+    .success-container {
+      text-align: center;
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #1e40af;
+    }
+    p {
+      font-size: 18px;
+      color: #374151;
+    }
+    button {
+      padding: 12px 25px;
+      margin-top: 20px;
+      background: #1e40af;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="success-container">
+    <h1>Login Successful!</h1>
+    <p id="userInfo"></p>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    // Display user info from localStorage
+    const name = localStorage.getItem("userName") || "User";
+    const role = localStorage.getItem("userRole") || "";
+    const email = localStorage.getItem("userEmail") || "";
+    document.getElementById("userInfo").innerText = `Welcome, ${name} (${role})\nEmail: ${email}`;
+
+    // Logout function
+    function logout() {
+      localStorage.clear();
+      window.location.href = "/login.html";
+    }
+  </script>
+    <script src="/js/completionPopperGlobal.js"></script>
+</body>
+</html>
+
+
+

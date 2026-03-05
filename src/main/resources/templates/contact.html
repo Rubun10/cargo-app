@@ -1,0 +1,360 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Cargo Assign</title>
+    <style>
+        :root {
+            --bg: #f8f5ef;
+            --surface: #ffffff;
+            --ink: #22223b;
+            --muted: #5f6273;
+            --primary: #0f766e;
+            --primary-dark: #0b5f59;
+            --accent: #ffb703;
+            --line: #d7d9e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 85% 15%, #ffe3a5 0%, rgba(255, 227, 165, 0) 30%),
+                radial-gradient(circle at 10% 90%, #c7eee8 0%, rgba(199, 238, 232, 0) 34%),
+                var(--bg);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .header-nav{
+            position: relative;
+            bottom: 20px;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .page {
+            max-width: 980px;
+            margin: 0 auto;
+            background: var(--surface);
+            border: 1px solid #eceef4;
+            border-radius: 18px;
+            box-shadow: 0 20px 40px rgba(25, 28, 38, 0.08);
+            overflow: hidden;
+        }
+
+        .hero {
+            padding: 28px 34px;
+            background: linear-gradient(120deg, #0f766e 0%, #14532d 100%);
+            color: #f8fffd;
+        }
+
+        .hero h1 {
+            font-size: clamp(1.7rem, 2.5vw, 2.2rem);
+            margin-bottom: 8px;
+            letter-spacing: 0.2px;
+        }
+
+        .hero p {
+            color: #dcfce7;
+            font-size: 0.98rem;
+            line-height: 1.5;
+            max-width: 700px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 28px;
+            padding: 34px;
+        }
+
+        .form-wrap h2,
+        .info-wrap h2 {
+            font-size: 1.15rem;
+            margin-bottom: 16px;
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.92rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #1f2937;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.95rem;
+            color: var(--ink);
+            background-color: #fff;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+        }
+
+        textarea {
+            min-height: 130px;
+            resize: vertical;
+        }
+
+        .btn {
+            margin-top: 4px;
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 16px;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.15s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .form-status {
+            margin-top: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-height: 20px;
+        }
+
+        .form-status.success {
+            color: #166534;
+        }
+
+        .form-status.error {
+            color: #b91c1c;
+        }
+
+        .info-wrap {
+            background: #fcf8ef;
+            border: 1px solid #f5e8cb;
+            border-radius: 14px;
+            padding: 20px;
+            align-self: start;
+        }
+
+        .info-card {
+            margin-bottom: 18px;
+        }
+
+        .info-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-card h3 {
+            font-size: 0.95rem;
+            color: #6b4f00;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .info-card p,
+        .info-card a {
+            color: var(--muted);
+            font-size: 0.93rem;
+            line-height: 1.55;
+            text-decoration: none;
+        }
+
+        .info-card a:hover {
+            color: var(--primary);
+        }
+
+        .badge {
+            display: inline-block;
+            margin-top: 8px;
+            background: var(--accent);
+            color: #3b2e00;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 999px;
+        }
+
+        @media (max-width: 860px) {
+            .content {
+                grid-template-columns: 1fr;
+                padding: 24px;
+            }
+
+            .hero {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                padding: 16px;
+            }
+
+            .hero h1 {
+                font-size: 1.45rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-nav">
+            <a class="back-link" href="/dashboard">Back </a>
+        </div>
+    <main class="page">
+        <section class="hero">
+            <h1>Contact Cargo Assign</h1>
+            <p>Need help with loads, driver assignments, or account issues? Share details and our support team will get back to you shortly.</p>
+        </section>
+
+        <section class="content">
+            <div class="form-wrap">
+                <h2>Send us a message</h2>
+                <form id="contactForm">
+                    <div class="field">
+                        <label for="name">Full Name</label>
+                        <input id="name" name="name" type="text" placeholder="Enter your full name" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="email">Email Address</label>
+                        <input id="email" name="email" type="email" placeholder="example@mail.com" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="phone">Phone Number</label>
+                        <input id="phone" name="phone" type="tel" placeholder="+91 98765 43210">
+                    </div>
+
+                    <div class="field">
+                        <label for="message">How can we help?</label>
+                        <textarea id="message" name="message" placeholder="Tell us your issue or question..." required></textarea>
+                    </div>
+
+                    <button class="btn" type="submit">Submit Request</button>
+                    <p id="formStatus" class="form-status" aria-live="polite"></p>
+                </form>
+            </div>
+
+            <aside class="info-wrap">
+                <h2>Support Details</h2>
+
+                <div class="info-card">
+                    <h3>Phone</h3>
+                    <p><a href="tel:+919892845410">+91 98928 45410</a></p>
+                    <p><a href="tel:+919876543210">+91 9876543210</a></p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Email</h3>
+                    <p><a href="mailto:support@cargoassign.com">support@cargoassign.com</a></p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Office Location</h3>
+                    <p>abc, Anna Nagar, 3rd Street<br>Coimbatore, Tamil Nadu</p>
+                    <span class="badge">Mon-Sat | 9:00 AM - 7:00 PM</span>
+                </div>
+            </aside>
+        </section>
+    </main>
+    <script src="/js/completionPopperGlobal.js"></script>
+    <script>
+        (function () {
+            const form = document.getElementById("contactForm");
+            const statusEl = document.getElementById("formStatus");
+            const submitBtn = form ? form.querySelector("button[type='submit']") : null;
+
+            if (!form || !statusEl || !submitBtn) return;
+
+            function setStatus(message, type) {
+                statusEl.textContent = message || "";
+                statusEl.classList.remove("success", "error");
+                if (type) {
+                    statusEl.classList.add(type);
+                }
+            }
+
+            form.addEventListener("submit", async function (event) {
+                event.preventDefault();
+                setStatus("", null);
+
+                const payload = {
+                    name: form.name.value.trim(),
+                    email: form.email.value.trim(),
+                    phone: form.phone.value.trim(),
+                    message: form.message.value.trim()
+                };
+
+                if (!payload.name || !payload.email || !payload.message) {
+                    setStatus("Please fill all required fields.", "error");
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = "Submitting...";
+
+                try {
+                    const res = await fetch("/api/contact", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await res.json().catch(() => ({}));
+                    const message = data && data.message ? data.message : "Failed to submit request";
+
+                    if (!res.ok) {
+                        setStatus(message, "error");
+                        return;
+                    }
+
+                    setStatus("Request submitted successfully. We will contact you soon.", "success");
+                    form.reset();
+                } catch (e) {
+                    setStatus("Network error. Please try again.", "error");
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
+
+
+

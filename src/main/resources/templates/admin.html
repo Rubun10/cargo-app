@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>KYC Approval Dashboard - Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .header {
+            width: 100%;
+            max-width: 980px;
+            margin-bottom: 20px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 25px;
+            background: linear-gradient(120deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .nav h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .nav h4 {
+            font-size: 1rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .nav i {
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .nav i:hover {
+            transform: scale(1.1);
+        }
+
+        .page {
+            max-width: 980px;
+            width: 100%;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .hero {
+            padding: 30px 30px 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .hero h4 {
+            color: #374151;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .box {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .box input {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: default;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .pending {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .verified {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .rejected {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .form-wrap h4 {
+            color: #374151;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .table th {
+            background: #f9fafb;
+            color: #374151;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 15px;
+            text-align: left;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .table td {
+            padding: 15px;
+            color: #6b7280;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .table tr:hover td {
+            background: #f9fafb;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-approve {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-reject {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .btn-view {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .refresh-btn {
+            background: #6b7280;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            float: right;
+        }
+
+        .refresh-btn:hover {
+            background: #4b5563;
+        }
+
+        /* Modal Popup Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(120deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section h5 {
+            color: #374151;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .detail-item {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #4f46e5;
+        }
+
+        .detail-item label {
+            display: block;
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-item span {
+            font-size: 0.95rem;
+            color: #111827;
+            font-weight: 500;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .image-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .image-item:hover {
+            transform: scale(1.02);
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-item .image-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 6px;
+            font-size: 0.75rem;
+            text-align: center;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .modal-footer .btn {
+            padding: 10px 24px;
+            font-size: 0.95rem;
+        }
+
+        /* Tick & Poppers Animation */
+        .popper {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popper.active {
+            display: flex;
+            background: rgba(16, 185, 129, 0.95);
+            backdrop-filter: blur(8px);
+        }
+
+        .popper.reject.active {
+            background: rgba(239, 68, 68, 0.95);
+        }
+
+        .popper-core {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            animation: popperPopIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .popper-check {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 60px rgba(255, 255, 255, 0.3);
+        }
+
+        .popper-check i {
+            font-size: 120px;
+            color: white;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+        }
+
+        .popper-text {
+            background: white;
+            padding: 16px 40px;
+            border-radius: 999px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #10b981;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .popper.reject .popper-text {
+            color: #ef4444;
+        }
+
+        @keyframes popperPopIn {
+            0% {
+                transform: scale(0.2);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .popper-confetti {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            left: 50%;
+            top: 50%;
+            opacity: 0;
+            border-radius: 4px;
+            animation: confettiBurst 1.2s ease-out forwards;
+            animation-delay: var(--delay, 0ms);
+            transform: translate(-50%, -50%);
+            background: var(--color, white);
+            box-shadow: 0 2px 10px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes confettiBurst {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.1) rotate(0deg);
+            }
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2) rotate(90deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) rotate(var(--rot, 720deg));
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .box {
+                flex-direction: column;
+            }
+            
+            .table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .image-gallery {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .modal-content {
+                width: 98%;
+                margin: 10px;
+            }
+            
+            .popper-check {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .popper-check i {
+                font-size: 90px;
+            }
+            
+            .popper-text {
+                font-size: 18px;
+                padding: 12px 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .nav i {
+                top: 0;
+            }
+            
+            .hero, .main-content {
+                padding: 20px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav">
+            <h3><i class="fas fa-shipping-fast" style="margin-right: 10px;"></i>Cargo Assign</h3>
+            <h4>Admin Panel</h4>
+            <i id="userIcon" class="fas fa-user-circle"></i>
+        </div>
+    </header>
+
+    <main class="page">
+        <section class="hero">
+            <h4><i class="fas fa-id-card" style="margin-right: 8px;"></i>KYC Approval Dashboard</h4>
+
+            <div class="box">
+                <input class="pending" id="pendingCount" readonly value="0 Pending Approvals">
+                <input class="verified" id="verifiedCount" readonly value="0 Verified">
+                <input class="rejected" id="rejectedCount" readonly value="0 Rejected">
+            </div>
+        </section>
+
+        <section class="main-content">
+            <div class="form-wrap">
+                <h4>
+                    <i class="fas fa-clock" style="margin-right: 8px;"></i>Pending Verification
+                    <button class="refresh-btn" onclick="loadData()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </h4>
+
+                <div id="inner-content">
+                    <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Popup for KYC Details -->
+    <div class="modal-overlay" id="kycModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-id-card"></i> KYC Details</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be populated dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-reject" onclick="rejectFromModal()">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+                <button class="btn btn-approve" onclick="approveFromModal()">
+                    <i class="fas fa-check"></i> Approve
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tick & Poppers Animation Container -->
+    <div class="popper" id="successPopper">
+        <div class="popper-core">
+            <div class="popper-check">
+                <i class="fas fa-circle-check"></i>
+            </div>
+            <div class="popper-text" id="popperMessage">KYC Approved Successfully!</div>
+        </div>
+        <div class="popper-confetti" id="successConfetti"></div>
+    </div>
+
+    <div class="popper reject" id="rejectPopper">
+        <div class="popper-core">
+            <div class="popper-check">
+                <i class="fas fa-circle-xmark"></i>
+            </div>
+            <div class="popper-text" id="rejectMessage">KYC Rejected</div>
+        </div>
+        <div class="popper-confetti" id="rejectConfetti"></div>
+    </div>
+
+    <script>
+        // Store pending verifications data
+        let pendingVerifications = [];
+        let currentModalItem = null;
+
+        // API Base URL
+        const API_BASE = '/api/admin';
+
+        // Popper elements
+        const successPopper = document.getElementById('successPopper');
+        const rejectPopper = document.getElementById('rejectPopper');
+        const popperMessage = document.getElementById('popperMessage');
+        const rejectMessage = document.getElementById('rejectMessage');
+        const successConfetti = document.getElementById('successConfetti');
+        const rejectConfetti = document.getElementById('rejectConfetti');
+        
+        let popperTimer = null;
+
+        // Load data from API
+        async function loadData() {
+            const contentDiv = document.getElementById('inner-content');
+            contentDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+            
+            try {
+                // Load statistics
+                const statsResponse = await fetch(`${API_BASE}/statistics`);
+                if (statsResponse.status === 401) {
+                    contentDiv.innerHTML = '<div class="no-data">Please login as admin to view this page.</div>';
+                    return;
+                }
+                const stats = await statsResponse.json();
+                
+                document.getElementById('pendingCount').value = (stats.totalPending || 0) + ' Pending Approvals';
+                document.getElementById('verifiedCount').value = (stats.totalVerified || 0) + ' Verified';
+                document.getElementById('rejectedCount').value = (stats.totalRejected || 0) + ' Rejected';
+
+                // Load pending verifications
+                const response = await fetch(`${API_BASE}/pending-verifications`);
+                const data = await response.json();
+                
+                pendingVerifications = data;
+                renderTable(data);
+            } catch (error) {
+                contentDiv.innerHTML = '<div class="no-data">Error loading data. Please refresh.</div>';
+            }
+        }
+
+        // Render the table
+        function renderTable(data) {
+            const contentDiv = document.getElementById('inner-content');
+            
+            if (!data || data.length === 0) {
+                contentDiv.innerHTML = '<div class="no-data"><i class="fas fa-check-circle" style="font-size: 48px; color: #10b981; margin-bottom: 10px;"></i><br>No pending verifications</div>';
+                return;
+            }
+
+            let html = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Document</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            data.forEach(item => {
+                const kycId = item.id;
+                const type = item.type;
+                const name = item.name || 'Unknown';
+                const docType = item.documentType || 'N/A';
+                
+                html += `
+                    <tr>
+                        <td>#KY${kycId}</td>
+                        <td>${name}</td>
+                        <td>${type === 'DRIVER' ? '<i class="fas fa-truck"></i> Driver' : '<i class="fas fa-building"></i> Shipper'}</td>
+                        <td>${docType}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-view" onclick="viewDocument(${kycId}, '${type}')">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="btn btn-approve" onclick="approveKYC(${kycId}, '${type}', '${name}')">
+                                    <i class="fas fa-check"></i> Approve
+                                </button>
+                                <button class="btn btn-reject" onclick="rejectKYC(${kycId}, '${type}', '${name}')">
+                                    <i class="fas fa-times"></i> Reject
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            contentDiv.innerHTML = html;
+        }
+
+        // View document details in modal popup
+        function viewDocument(id, type) {
+            const item = pendingVerifications.find(v => v.id === id);
+            if (!item) {
+                alert('Document not found');
+                return;
+            }
+
+            currentModalItem = item;
+            
+            let html = '';
+            
+            if (type === 'DRIVER') {
+                html = `
+                    <div class="detail-section">
+                        <h5><i class="fas fa-user"></i> Personal Information</h5>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <label>Name</label>
+                                <span>${item.name || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Aadhar Name</label>
+                                <span>${item.aadharName || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Aadhar Number</label>
+                                <span>${item.aadharNumber || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Location</label>
+                                <span>${item.city || 'N/A'}, ${item.state || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h5><i class="fas fa-id-card"></i> License Information</h5>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <label>License Number</label>
+                                <span>${item.licenseNumber || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Valid From</label>
+                                <span>${item.licenseValidFrom || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Valid To</label>
+                                <span>${item.licenseValidTo || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h5><i class="fas fa-truck"></i> Vehicle Information</h5>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <label>Vehicle Type</label>
+                                <span>${item.vehicleType || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Truck Number</label>
+                                <span>${item.truckNumber || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>RC Number</label>
+                                <span>${item.rcNumber || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Insurance Valid</label>
+                                <span>${item.insuranceFrom || 'N/A'} to ${item.insuranceTo || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h5><i class="fas fa-images"></i> Documents & Photos</h5>
+                        <div class="image-gallery">
+                            ${item.driverPhotoUrl ? `
+                            <div class="image-item">
+                                <img src="${item.driverPhotoUrl}" alt="Driver Photo" onerror="this.src='https://via.placeholder.com/150?text=No+Photo'">
+                                <div class="image-label">Driver Photo</div>
+                            </div>
+                            ` : ''}
+                            ${item.licenseFrontUrl ? `
+                            <div class="image-item">
+                                <img src="${item.licenseFrontUrl}" alt="License Front" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                                <div class="image-label">License Front</div>
+                            </div>
+                            ` : ''}
+                            ${item.licenseBackUrl ? `
+                            <div class="image-item">
+                                <img src="${item.licenseBackUrl}" alt="License Back" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                                <div class="image-label">License Back</div>
+                            </div>
+                            ` : ''}
+                            ${item.rcFrontUrl ? `
+                            <div class="image-item">
+                                <img src="${item.rcFrontUrl}" alt="RC Front" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                                <div class="image-label">RC Front</div>
+                            </div>
+                            ` : ''}
+                            ${item.rcBackUrl ? `
+                            <div class="image-item">
+                                <img src="${item.rcBackUrl}" alt="RC Back" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                                <div class="image-label">RC Back</div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Shipper
+                html = `
+                    <div class="detail-section">
+                        <h5><i class="fas fa-user"></i> Personal Information</h5>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <label>Name</label>
+                                <span>${item.name || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Aadhar Name</label>
+                                <span>${item.aadharName || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Aadhar Number</label>
+                                <span>${item.aadharNumber || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h5><i class="fas fa-building"></i> Business Information</h5>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <label>Company Name</label>
+                                <span>${item.companyName || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>GSTIN</label>
+                                <span>${item.gstin || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Business Email</label>
+                                <span>${item.businessEmail || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Business Mobile</label>
+                                <span>${item.businessMobile || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Address</label>
+                                <span>${item.address || 'N/A'}, ${item.city || 'N/A'}, ${item.state || 'N/A'} - ${item.pincode || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h5><i class="fas fa-images"></i> Documents & Photos</h5>
+                        <div class="image-gallery">
+                            ${item.userPhoto ? `
+                            <div class="image-item">
+                                <img src="${item.userPhoto}" alt="User Photo" onerror="this.src='https://via.placeholder.com/150?text=No+Photo'">
+                                <div class="image-label">User Photo</div>
+                            </div>
+                            ` : ''}
+                            ${item.aadharImage ? `
+                            <div class="image-item">
+                                <img src="${item.aadharImage}" alt="Aadhar Image" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                                <div class="image-label">Aadhar Image</div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('modalBody').innerHTML = html;
+            document.getElementById('kycModal').classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('kycModal').classList.remove('active');
+            currentModalItem = null;
+        }
+
+        // Approve from modal
+        function approveFromModal() {
+            if (currentModalItem) {
+                closeModal();
+                approveKYC(currentModalItem.id, currentModalItem.type, currentModalItem.name);
+            }
+        }
+
+        // Reject from modal
+        function rejectFromModal() {
+            if (currentModalItem) {
+                const name = currentModalItem.name;
+                closeModal();
+                rejectKYC(currentModalItem.id, currentModalItem.type, name);
+            }
+        }
+
+        // Approve KYC
+        async function approveKYC(id, type, name) {
+            try {
+                const formData = new FormData();
+                formData.append('type', type);
+                formData.append('id', id);
+
+                const response = await fetch(`${API_BASE}/approve-kyc`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showSuccessPopper(name);
+                    // Remove from local array
+                    pendingVerifications = pendingVerifications.filter(v => v.id !== id);
+                    // Update counter
+                    updateCounters('approve');
+                    // Re-render table after animation
+                    setTimeout(() => renderTable(pendingVerifications), 500);
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error approving KYC. Please try again.');
+            }
+        }
+
+        // Reject KYC
+        async function rejectKYC(id, type, name) {
+            if (!confirm(`Are you sure you want to reject ${name}'s KYC? This will delete their documents.`)) {
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('type', type);
+                formData.append('id', id);
+
+                const response = await fetch(`${API_BASE}/reject-kyc`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showRejectPopper(name);
+                    // Remove from local array
+                    pendingVerifications = pendingVerifications.filter(v => v.id !== id);
+                    // Update counter
+                    updateCounters('reject');
+                    // Re-render table after animation
+                    setTimeout(() => renderTable(pendingVerifications), 500);
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error rejecting KYC. Please try again.');
+            }
+        }
+
+        // Update counters
+        function updateCounters(action) {
+            const pending = document.getElementById('pendingCount');
+            const verified = document.getElementById('verifiedCount');
+            const rejected = document.getElementById('rejectedCount');
+
+            let pendingVal = parseInt(pending.value) || 0;
+            let verifiedVal = parseInt(verified.value) || 0;
+            let rejectedVal = parseInt(rejected.value) || 0;
+
+            if (pendingVal > 0) {
+                pendingVal--;
+                if (action === 'approve') {
+                    verifiedVal++;
+                } else {
+                    rejectedVal++;
+                }
+            }
+
+            pending.value = pendingVal + ' Pending Approvals';
+            verified.value = verifiedVal + ' Verified';
+            rejected.value = rejectedVal + ' Rejected';
+        }
+
+        function renderConfetti(confettiElement, isReject = false) {
+            if (!confettiElement) return;
+            confettiElement.innerHTML = "";
+            
+            const colors = isReject 
+                ? ["#ef4444", "#f87171", "#fca5a5", "#fee2e2", "#dc2626", "#b91c1c"]
+                : ["#10b981", "#34d399", "#6ee7b7", "#a7f3d0", "#059669", "#047857"];
+            
+            const pieceCount = 50;
+            
+            for (let i = 0; i < pieceCount; i++) {
+                const piece = document.createElement("span");
+                piece.className = "confetti-piece";
+                
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 150 + Math.random() * 250;
+                
+                const dx = Math.cos(angle) * distance * (0.5 + Math.random() * 0.8);
+                const dy = Math.sin(angle) * distance * (0.5 + Math.random() * 0.8);
+                const rotate = Math.floor(Math.random() * 720) - 360;
+                const delay = Math.floor(Math.random() * 200);
+                
+                piece.style.setProperty("--dx", `${dx.toFixed(1)}px`);
+                piece.style.setProperty("--dy", `${dy.toFixed(1)}px`);
+                piece.style.setProperty("--rot", `${rotate}deg`);
+                piece.style.setProperty("--delay", `${delay}ms`);
+                piece.style.setProperty("--color", colors[i % colors.length]);
+                
+                const width = 6 + Math.floor(Math.random() * 8);
+                const height = 15 + Math.floor(Math.random() * 15);
+                piece.style.width = `${width}px`;
+                piece.style.height = `${height}px`;
+                
+                confettiElement.appendChild(piece);
+            }
+        }
+
+        function hideAllPoppers() {
+            successPopper.classList.remove('active');
+            rejectPopper.classList.remove('active');
+            
+            if (successConfetti) successConfetti.innerHTML = "";
+            if (rejectConfetti) rejectConfetti.innerHTML = "";
+            
+            document.body.style.overflow = '';
+            
+            if (popperTimer) {
+                clearTimeout(popperTimer);
+                popperTimer = null;
+            }
+        }
+
+        function showSuccessPopper(userName) {
+            hideAllPoppers();
+            
+            popperMessage.textContent = `${userName}'s KYC Approved! 🎉`;
+            renderConfetti(successConfetti, false);
+            
+            successPopper.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            popperTimer = setTimeout(() => {
+                successPopper.classList.remove('active');
+                if (successConfetti) successConfetti.innerHTML = "";
+                document.body.style.overflow = '';
+            }, 3000);
+        }
+
+        function showRejectPopper(userName) {
+            hideAllPoppers();
+            
+            rejectMessage.textContent = `${userName}'s KYC Rejected`;
+            renderConfetti(rejectConfetti, true);
+            
+            rejectPopper.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            popperTimer = setTimeout(() => {
+                rejectPopper.classList.remove('active');
+                if (rejectConfetti) rejectConfetti.innerHTML = "";
+                document.body.style.overflow = '';
+            }, 3000);
+        }
+
+        // Close popper on click
+        successPopper.addEventListener('click', hideAllPoppers);
+        rejectPopper.addEventListener('click', hideAllPoppers);
+
+        // Close modal on overlay click
+        document.getElementById('kycModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Keyboard support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideAllPoppers();
+                closeModal();
+            }
+        });
+
+        // Load data on page load
+        window.addEventListener('load', loadData);
+    </script>
+    
+    <!-- Global Completion & KYC Notification Popper -->
+    <script src="/js/completionPopperGlobal.js"></script>
+</body>
+</html>

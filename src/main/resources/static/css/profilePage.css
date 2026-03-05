@@ -1,0 +1,489 @@
+	.profile{
+	width:100%;
+	}
+		.info {
+            width: 100%;
+            height: 200px;
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+		
+        .user-id {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .profile-settings-container {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            padding: 30px 20px;
+            margin-top: -30px;
+            min-height: calc(100vh - 140px);
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 1;
+        }
+
+        .settings-section {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 15px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .setting-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .setting-label {
+            width: 140px;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .setting-value {
+            flex: 1;
+            color: #4a5568;
+            font-size: 15px;
+            min-width: 150px;
+            padding: 0 10px;
+        }
+
+        .edit-btn {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            min-width: 80px;
+            justify-content: center;
+            height: 36px;
+        }
+
+        .edit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+         /*Edit Box Styles - SIMPLIFIED */
+        .edit-box {
+            display: none;
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            padding: 20px;
+            z-index: 100;
+            width: 320px;
+            margin-top: 0;
+            border: 1px solid #e2e8f0;
+            transform: translateY(-50%);
+        }
+
+        .edit-box.active {
+            display: block;
+            animation: fadeInScale 0.2s ease;
+        }
+
+        .edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .edit-title {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-edit {
+            background: none;
+            border: none;
+            color: #718096;
+            cursor: pointer;
+            font-size: 20px;
+            transition: color 0.3s;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .close-edit:hover {
+            background: #f7fafc;
+            color: #e53e3e;
+        }
+
+        .edit-input-group {
+            margin-bottom: 20px;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .edit-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .edit-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .save-btn, .cancel-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            height: 40px;
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        .save-btn {
+            background: linear-gradient(to right, #48bb78, #38a169);
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: linear-gradient(to right, #38a169, #2f855a);
+            transform: translateY(-1px);
+        }
+
+        .cancel-btn {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+
+        .cancel-btn:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+          
+        .success-label {
+            position: absolute;
+            right: 15px;
+            background: #48bb78;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2s forwards;
+            z-index: 10;
+            white-space: nowrap;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.2);
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e2e8f0;
+            transition: .3s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(to right, #48bb78, #38a169);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        .toggle-label {
+            color: #4a5568;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .setting-label i {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .fa-phone {
+            color: #4299e1;
+        }
+
+        .fa-envelope {
+            color: #ed8936;
+        }
+
+        .fa-map-marker-alt {
+            color: #38b2ac;
+        }
+
+        .fa-lock {
+            color: #9f7aea;
+        }
+
+        .fa-bell {
+            color: #f56565;
+        }
+
+        @media (max-width: 768px) {
+            .info {
+                padding: 20px;
+                gap: 15px;
+                height: 180px;
+            }
+
+            /* .avatar-circle {
+                width: 70px;
+                height: 70px;
+                font-size: 28px;
+                border-radius: 15px;
+            } */
+
+            .user-info h2 {
+                font-size: 20px;
+            }
+
+            .user-id {
+                font-size: 14px;
+            }
+
+            .profile-settings-container {
+                padding: 25px 15px;
+                border-radius: 20px 20px 0 0;
+                margin-top: -20px;
+            }
+
+            .setting-item {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                grid-template-rows: auto auto;
+                gap: 8px;
+                padding: 16px;
+                border: 1px solid #e2e8f0;
+                margin-bottom: 8px;
+                border-radius: 10px;
+                align-items: start;
+            }
+
+            .setting-label {
+                grid-column: 1 / 3;
+                grid-row: 1;
+                width: 100%;
+                font-size: 14px;
+                padding-bottom: 8px;
+                margin-bottom: 0;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .setting-value {
+                grid-column: 1;
+                grid-row: 2;
+                width: 100%;
+                padding: 0;
+                min-width: unset;
+                font-size: 14px;
+                padding-left: 30px;
+            }
+
+            .edit-btn {
+                grid-column: 2;
+                grid-row: 2;
+                position: static;
+                width: auto;
+                padding: 8px 12px;
+                font-size: 13px;
+                height: 32px;
+                min-width: 60px;
+                justify-self: end;
+                margin-top: 0;
+            }
+
+            .edit-box {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) !important;
+                width: 90%;
+                max-width: 320px;
+                margin-top: 0;
+                 animation: fadeInScaleMobile 1s ease; 
+            }
+
+            .toggle-container {
+                grid-column: 1 / 3;
+                grid-row: 2;
+                width: 100%;
+                flex-direction: row;
+                align-items: center;
+                gap: 10px;
+                padding-left: 30px;
+                margin-top: 0;
+            }
+
+            .toggle-switch {
+                align-self: center;
+            }
+
+            .success-label {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                animation: fadeInScale 1s ease, fadeOut 1s ease 2s forwards;
+                white-space: normal;
+                text-align: center;
+                max-width: 250px;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .profile-settings-container {
+                max-width: 90%;
+                margin: -30px auto 0;
+            }
+
+            .setting-label {
+                width: 130px;
+                font-size: 14px;
+            }
+
+            .edit-btn {
+                padding: 8px 14px;
+                font-size: 13px;
+                min-width: 75px;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .profile-settings-container {
+                max-width: 800px;
+                margin: -30px auto 0;
+            }
+        }
+
+        @keyframes fadeInScale {
+            from { 
+                opacity: 0; 
+                transform: translateY(-50%) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(-50%) scale(1); 
+            }
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+    

@@ -1,0 +1,341 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargo Tracking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2874f0;
+            --muted: #64748b;
+            --bg: #f1f3f6;
+            --card: #fff;
+            --ok: #22c55e;
+            --line: #e5e7eb;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: var(--bg);
+            color: #111827;
+        }
+        .top {
+            background: linear-gradient(90deg, #2874f0, #0ea5e9);
+            color: #fff;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .top h2 { margin: 0; font-size: 1.1rem; }
+        .back {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .wrap {
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 0 14px;
+        }
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .pill {
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        #searchInput {
+            flex: 1;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 14px;
+            margin-bottom: 14px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+        }
+        .head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .muted {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        .status {
+            font-size: 12px;
+            font-weight: 800;
+            color: #0f766e;
+            background: #ccfbf1;
+            padding: 6px 9px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+        .steps {
+            display: flex;
+            gap: 0;
+            margin-top: 8px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--line);
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            font-size: 12px;
+            color: #94a3b8;
+            padding-top: 20px;
+        }
+        .step::before {
+            content: "";
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #cbd5e1;
+            background: #fff;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+        .step::after {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: calc(-50% + 6px);
+            width: calc(100% - 12px);
+            height: 2px;
+            background: #cbd5e1;
+            z-index: 1;
+        }
+        .step:first-child::after { display: none; }
+        .step.done { color: #15803d; font-weight: 700; }
+        .step.done::before { border-color: var(--ok); background: var(--ok); }
+        .step.done::after { background: var(--ok); }
+        .step.current { color: #1d4ed8; font-weight: 800; }
+        .step.current::before { border-color: #2563eb; background: #dbeafe; }
+        .actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            border: 0;
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-start { background: #22c55e; color: #fff; }
+        .btn-done { background: #2874f0; color: #fff; }
+        .empty {
+            text-align: center;
+            color: #64748b;
+            background: #fff;
+            border-radius: 10px;
+            border: 1px dashed #cbd5e1;
+            padding: 35px 14px;
+        }
+    </style>
+</head>
+<body>
+    <header class="top">
+        <a class="back" href="/dashboard"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        <h2>Cargo Tracking</h2>
+    </header>
+
+    <div class="wrap">
+        <div class="toolbar">
+            <span class="pill" id="rolePill">Role: -</span>
+            <input id="searchInput" type="text" placeholder="Search by load id, route, shipper">
+        </div>
+        <div id="list"></div>
+    </div>
+
+    <script>
+        const listEl = document.getElementById("list");
+        const rolePill = document.getElementById("rolePill");
+        const searchInput = document.getElementById("searchInput");
+
+        let role = null;
+        let allLoads = [];
+
+        const FLOW = ["AVAILABLE", "DRIVER_REQUESTED", "SHIPPER_CONFIRMED", "ACTIVE", "COMPLETED"];
+
+        function statusPriority(status) {
+            const s = String(status || "").toUpperCase();
+            if (s === "ACTIVE") return 0;              // current working
+            if (s === "SHIPPER_CONFIRMED") return 1;
+            if (s === "DRIVER_REQUESTED") return 2;
+            if (s === "AVAILABLE") return 3;
+            if (s === "COMPLETED") return 4;
+            return 5;
+        }
+
+        function loadIdNumber(loadId) {
+            const raw = String(loadId || "").trim().toUpperCase().replace("LD-", "");
+            const n = Number(raw);
+            return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
+        }
+
+        function stepState(step, current) {
+            const cur = FLOW.indexOf(current || "");
+            const idx = FLOW.indexOf(step);
+            if (idx < cur) return "done";
+            if (idx === cur) return "current";
+            return "";
+        }
+
+        function formatWeight(value, unit) {
+            const numeric = Number(value);
+            const safeValue = Number.isFinite(numeric) ? numeric : 0;
+            const safeUnit = String(unit || "kg").trim().toLowerCase();
+            const label = safeUnit === "ton" ? "Ton" : "Kg";
+            return `${safeValue} ${label}`;
+        }
+
+        function render() {
+            const term = searchInput.value.trim().toLowerCase();
+            const filtered = allLoads.filter(l => {
+                const hay = [
+                    l.loadId, l.shipperName, l.pickupLocation, l.dropLocation, l.status
+                ].join(" ").toLowerCase();
+                return hay.includes(term);
+            }).sort((a, b) => {
+                const byStatus = statusPriority(a.status) - statusPriority(b.status);
+                if (byStatus !== 0) return byStatus;
+                return loadIdNumber(a.loadId) - loadIdNumber(b.loadId);
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<div class="empty">No tracking cargos found.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(load => {
+                const currentStatus = (load.status || "").toUpperCase();
+                const timeline = FLOW.map(step => {
+                    const cls = stepState(step, currentStatus);
+                    return `<div class="step ${cls}">${step.replace("_", " ")}</div>`;
+                }).join("");
+
+                let actions = "";
+                if (role === "DRIVER") {
+                    if (currentStatus === "DRIVER_REQUESTED" || currentStatus === "SHIPPER_CONFIRMED") {
+                        actions += `<button class="btn btn-start" data-id="${load.loadId}" data-status="ACTIVE">Start Trip</button>`;
+                    }
+                    if (currentStatus === "ACTIVE") {
+                        actions += `<button class="btn btn-done" data-id="${load.loadId}" data-status="COMPLETED">Mark Delivered</button>`;
+                    }
+                }
+
+                return `
+                    <div class="card">
+                        <div class="head">
+                            <div>
+                                <div class="title">${load.shipperName || "-"} | ${load.loadId || "-"}</div>
+                                <div class="muted">Route: ${load.pickupLocation || "-"} &rarr; ${load.dropLocation || "-"}</div>
+                                <div class="muted">Weight: ${formatWeight(load.weightKg, load.weightUnit)} | Price: &#8377;${load.price || 0}</div>
+                            </div>
+                            <div class="status">${currentStatus || "-"}</div>
+                        </div>
+                        <div class="steps">${timeline}</div>
+                        <div class="actions">${actions}</div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        async function fetchRole() {
+            const res = await fetch("/api/user/me", { credentials: "include" });
+            if (res.status === 401) {
+                window.location.href = "/login";
+                return;
+            }
+            const user = await res.json();
+            role = (user.role || "").toUpperCase();
+            rolePill.textContent = `Role: ${role || "-"}`;
+        }
+
+        async function fetchLoads() {
+            const res = await fetch("/api/tracking/cargos", { credentials: "include" });
+            if (res.status === 401) {
+                window.location.href = "/login";
+                return;
+            }
+            if (!res.ok) {
+                listEl.innerHTML = `<div class="empty">Unable to load tracking data.</div>`;
+                return;
+            }
+            allLoads = await res.json();
+            render();
+        }
+
+        async function updateStatus(loadId, status, btn) {
+            btn.disabled = true;
+            const res = await fetch(`/api/tracking/cargos/${loadId}/status`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status })
+            });
+            if (!res.ok) {
+                let message = "Unable to update status";
+                try {
+                    const payload = await res.json();
+                    if (payload.message) message = payload.message;
+                } catch (_) {}
+                alert(message);
+                btn.disabled = false;
+                return;
+            }
+            await fetchLoads();
+        }
+
+        listEl.addEventListener("click", e => {
+            const btn = e.target.closest("button[data-id][data-status]");
+            if (!btn) return;
+            updateStatus(btn.dataset.id, btn.dataset.status, btn);
+        });
+
+        searchInput.addEventListener("input", render);
+
+        async function init() {
+            await fetchRole();
+            await fetchLoads();
+            setInterval(fetchLoads, 10000);
+        }
+        init();
+    </script>
+    <script src="/js/completionPopperGlobal.js"></script>
+</body>
+</html>
+
+
+

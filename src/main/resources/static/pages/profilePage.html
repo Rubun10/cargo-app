@@ -1,0 +1,196 @@
+<div class="profile-page">
+    <div class="info">
+        <div class="avatar-circle">
+			<img id="profile-userPhoto" src="" class="profile-image">
+			<i id="profile-userIcon" class="fas fa-user-circle"></i> 
+							
+        </div>
+        <div class="user-info">
+			<h2 class="userName">Loading Name...</h2>
+			           <p class="userIdText">User ID: Loading...</p>
+        </div>
+    </div>
+    
+    <div class="profile-settings-container">
+        <div class="settings-section">
+            <!-- mobile -->
+            <div class="setting-item" id="mobile-item">
+                <div class="setting-label">
+                    <i class="fas fa-phone"></i> Mobile number
+                </div>
+				<div class="setting-value" id="mobile-value">Loading...</div>
+                
+                <div class="edit-box" id="mobile-edit-box">
+                    <div class="edit-header">
+                        <div class="edit-title">
+                            <i class="fas fa-phone"></i> Edit Mobile
+                        </div>
+                        <button class="close-edit" data-field="mobile">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="edit-input-group">
+						<input
+						  type="tel"
+						  class="edit-input"
+						  id="mobile-input"
+						  name="mobile"
+						  autocomplete="tel"
+						  placeholder="Enter mobile number">
+
+                    </div>
+                    <div class="edit-actions">
+                        <button class="cancel-btn" data-field="mobile">
+                            Cancel
+                        </button>
+						<button type="button" class="save-btn" data-field="mobile">Save</button>
+
+                    </div>
+                </div>
+                
+                <button class="edit-btn" data-field="mobile">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+            </div>
+             <!-- Email -->
+            <div class="setting-item" id="email-item">
+                <div class="setting-label">
+                    <i class="fas fa-envelope"></i> Email
+                </div>
+				<div class="setting-value" id="email-value">Loading...</div>
+                
+                <div class="edit-box" id="email-edit-box">
+                    <div class="edit-header">
+                        <div class="edit-title">
+                            <i class="fas fa-envelope"></i> Edit Email
+                        </div>
+                        <button class="close-edit" data-field="email">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="edit-input-group">
+						<input
+						  type="email"
+						  class="edit-input"
+						  id="email-input"
+						  name="email"
+						  autocomplete="email"
+						  placeholder="Enter email address">
+
+                    </div>
+                    <div class="edit-actions">
+                        <button class="cancel-btn" data-field="email">
+                            Cancel
+                        </button>
+						<button type="button" class="save-btn" data-field="email">Save</button>
+
+                    </div>
+                </div>
+                
+                <button class="edit-btn" data-field="email">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+            </div>
+            
+             <!-- Location  -->
+            <div class="setting-item" id="location-item">
+                <div class="setting-label">
+                    <i class="fas fa-map-marker-alt"></i> Location
+                </div>
+                <div class="setting-value" id="location-value"></div>
+                
+                <div class="edit-box" id="location-edit-box">
+                    <div class="edit-header">
+                        <div class="edit-title">
+                            <i class="fas fa-map-marker-alt"></i> Edit Location
+                        </div>
+                        <button class="close-edit" data-field="location">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="edit-input-group">
+						<input
+						  type="text"
+						  class="edit-input"
+						  id="location-input"
+						  name="location"
+						  autocomplete="address-level2"
+						  placeholder="Enter location">
+
+                    </div>
+                    <div class="edit-actions">
+                        <button class="cancel-btn" data-field="location">
+                            Cancel
+                        </button>
+						<button type="button" class="save-btn" data-field="location">Save</button>
+
+                    </div>
+                </div>
+                
+                <button class="edit-btn" data-field="location">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+            </div>
+            
+             <!-- Password  -->
+            <div class="setting-item" id="password-item">
+                <div class="setting-label">
+                    <i class="fas fa-lock"></i> Password
+                </div>
+                <div class="setting-value" id="password-value">--------</div>
+                
+                <div class="edit-box" id="password-edit-box">
+                    <div class="edit-header">
+                        <div class="edit-title">
+                            <i class="fas fa-lock"></i> Change Password
+                        </div>
+                        <button class="close-edit" data-field="password">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="edit-input-group">
+						<input
+						  type="password"
+						  class="edit-input"
+						  id="password-input"
+						  name="new-password"
+						  autocomplete="new-password"
+						  placeholder="New password">
+
+                    </div>
+                    <div class="edit-input-group">
+                        <input type="password" class="edit-input" id="password-confirm" 
+                               placeholder="Confirm password">
+                    </div>
+                    <div class="edit-actions">
+                        <button class="cancel-btn" data-field="password">
+                            Cancel
+                        </button>
+						<button type="button" class="save-btn" data-field="password">Save</button>
+                    </div>
+                </div>
+                
+                <button class="edit-btn" data-field="password">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+            </div>
+            
+         
+            <div class="setting-item" id="notification-item">
+                <div class="setting-label">
+					
+                    <i class="fas fa-bell"></i>Live Traking Notification
+                </div>
+                <div class="setting-value">
+                    <div class="toggle-container">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notification-toggle">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label">Receive notifications</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

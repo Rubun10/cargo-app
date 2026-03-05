@@ -1,0 +1,34 @@
+<div class="cargo-available-page">
+    <header class="top-bar">
+        <h2>Available Cargo</h2>
+        <input type="text" id="searchInput" placeholder="Search cargo...">
+    </header>
+
+    <div class="cargo-container" id="cargoContainer"></div>
+
+    <!-- MODAL -->
+    <div class="modal" id="detailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Cargo Details</h3>
+                <button class="close-btn" onclick="closeDetails()">x</button>
+            </div>
+
+            <div class="details-grid">
+                <div class="detail-item"><b>Load ID</b><p id="dLoadId"></p></div>
+                <div class="detail-item"><b>Load Type</b><p id="dType"></p></div>
+                <div class="detail-item"><b>Weight</b><p id="dWeight"></p></div>
+                <div class="detail-item"><b>Price</b><p id="dPrice"></p></div>
+                <div class="detail-item"><b>Drop Date</b><p id="dDate"></p></div>
+                <div class="detail-item full"><b>Route</b><p id="dRoute"></p></div>
+                <div class="detail-item full"><b>Additional</b><p id="dAdd"></p></div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="confirm-btn" id="confirmBtn">Confirm</button>
+                <button class="cancel-btn" onclick="closeDetails()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
