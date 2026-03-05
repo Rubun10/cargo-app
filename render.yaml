@@ -1,11 +1,9 @@
 services:
   - type: web
     name: cargo-assign
-    env: java
+    env: docker
     plan: free
-    rootDir: .
-    buildCommand: "./mvnw clean package -DskipTests"
-    startCommand: "java -Dserver.port=$PORT -jar target/CargoAssign-0.0.1-SNAPSHOT.jar"
+    dockerfilePath: ./Dockerfile
     healthCheckPath: /
     envVars:
       - key: DB_URL
