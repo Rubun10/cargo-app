@@ -7,14 +7,17 @@ services:
     healthCheckPath: /
     envVars:
       - key: DB_URL
-        sync: false
+        value: "jdbc:postgresql://dpg-d6kplu3h46gs73d3u9i0-a:5432/cargo_assign_db_6v2e"
       - key: DB_USERNAME
-        sync: false
+        value: "cargo_assign_db_6v2e_user"
       - key: DB_PASSWORD
-        sync: false
+        value: "G6jWUNxZq69P2f0WxUaDnjgnooOsGrEx"
+      - key: DB_DRIVER
+        value: "org.postgresql.Driver"
       - key: IMAGEKIT_PRIVATE_KEY
         sync: false
       - key: JWT_SECRET
         sync: false
       - key: JWT_EXPIRATION_MS
         value: "86400000"
+
