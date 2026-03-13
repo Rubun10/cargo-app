@@ -362,6 +362,7 @@ const submitBtn = document.getElementById("submitBtn");
 const form = document.getElementById("verificationForm");
 const successMessage = document.getElementById("successMessage");
 const submitSpinner = document.getElementById("submitSpinner");
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 let current = 0;
 
@@ -421,6 +422,10 @@ function validateStep() {
                 showError("truckNumberError", "Truck number format: XX-00-XX-0000");
                 input.classList.add("error");
                 isValid = false;
+            } else if (input.type === "file" && input.files && input.files[0] && input.files[0].size > MAX_FILE_SIZE) {
+                showError(getErrorId(input), "File too large (max 5MB)");
+                input.classList.add("error");
+                isValid = false;
             } else {
                 input.classList.add("success");
                 clearError(getErrorId(input));
@@ -453,6 +458,19 @@ function validateStep() {
     return isValid;
 }
 
+function validateAllFileSizes() {
+    let ok = true;
+    const fileInputs = form.querySelectorAll('input[type="file"]');
+    for (let input of fileInputs) {
+        if (input.files && input.files[0] && input.files[0].size > MAX_FILE_SIZE) {
+            showError(getErrorId(input), "File too large (max 5MB)");
+            input.classList.add("error");
+            ok = false;
+        }
+    }
+    return ok;
+}
+
 // Helper functions
 function getErrorId(input) {
     if (input.name === "state" || input.name === "district" || input.name === "city") {
@@ -475,7 +493,7 @@ form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     // Final validation check
-    if (!validateStep()) return;
+    if (!validateStep() || !validateAllFileSizes()) return;
 
     submitBtn.disabled = true;
     submitSpinner.style.display = "inline-block";
@@ -505,7 +523,24 @@ form.addEventListener("submit", async (e) => {
 	        body: formData
 	    });
 
-	    const result = await response.json();
+	    const contentType = response.headers.get("content-type") || "";
+	    let result = null;
+	    let rawText = null;
+	    if (contentType.includes("application/json")) {
+	        result = await response.json();
+	    } else {
+	        rawText = await response.text();
+	    }
+
+	    if (!contentType.includes("application/json")) {
+	        if (response.status === 401 || response.status === 403) {
+	            alert("Login required. Please login again.");
+	            window.location.href = "/login";
+	        } else {
+	            alert("Submission failed. Server returned a non-JSON response. Please try again later.");
+	        }
+	        return;
+	    }
 		
 		if (!response.ok) {
 		    if (response.status === 401) {
@@ -514,7 +549,7 @@ form.addEventListener("submit", async (e) => {
 		    } else if (response.status === 403) {
 		        alert("Only drivers can submit verification.");
 		    } else if (response.status === 400) {
-		        alert(result.message || "Invalid request.");
+		        alert((result && result.message) || "Invalid request.");
 		    } else if (response.status === 500) {
 		        alert("Server error. Please try again later.");
 		    } else {

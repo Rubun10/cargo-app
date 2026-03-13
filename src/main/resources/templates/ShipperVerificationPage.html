@@ -452,6 +452,8 @@
             const resetBtn = document.getElementById('resetBtn');
             const submitSpinner = document.getElementById('submitSpinner');
             const successMessage = document.getElementById('successMessage');
+            const MAX_AADHAR_MB = 5;
+            const MAX_PHOTO_MB = 2;
             
             // File upload elements
             const aadharUpload = document.getElementById('aadharUpload');
@@ -600,11 +602,23 @@
                 if (!aadharInput.files.length) {
                     showError('aadharImageError', 'Please upload Aadhar card');
                     isValid = false;
+                } else {
+                    const aadharSizeMb = aadharInput.files[0].size / 1024 / 1024;
+                    if (aadharSizeMb > MAX_AADHAR_MB) {
+                        showError('aadharImageError', `File too large (max ${MAX_AADHAR_MB}MB)`);
+                        isValid = false;
+                    }
                 }
                 
                 if (!photoInput.files.length) {
                     showError('userPhotoError', 'Please upload your photo');
                     isValid = false;
+                } else {
+                    const photoSizeMb = photoInput.files[0].size / 1024 / 1024;
+                    if (photoSizeMb > MAX_PHOTO_MB) {
+                        showError('userPhotoError', `File too large (max ${MAX_PHOTO_MB}MB)`);
+                        isValid = false;
+                    }
                 }
                 
                 // Validate declaration
@@ -653,10 +667,27 @@
 			            body: formData
 			        });
 
-			        const result = await response.json();
+			        const contentType = response.headers.get("content-type") || "";
+			        let result = null;
+			        let rawText = null;
+			        if (contentType.includes("application/json")) {
+			            result = await response.json();
+			        } else {
+			            rawText = await response.text();
+			        }
+
+			        if (!contentType.includes("application/json")) {
+			            if (response.status === 401 || response.status === 403) {
+			                alert("Login required. Please login again.");
+			                window.location.href = "/login";
+			            } else {
+			                alert("Submission failed. Server returned a non-JSON response. Please try again later.");
+			            }
+			            return;
+			        }
 
 			        if (!response.ok) {
-			            alert(result.message || "Submission failed");
+			            alert((result && result.message) || "Submission failed");
 			            return;
 			        }
 
