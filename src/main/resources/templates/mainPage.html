@@ -1638,6 +1638,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             icon.style.display = "block";
         }
 
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("open") === "profile") {
+            goTo("profilePage");
+            const profileNav = document.getElementById("profilePage");
+            if (profileNav) {
+                document.querySelectorAll('.sidebar-nav li')
+                    .forEach(li => li.classList.remove('active'));
+                profileNav.classList.add("active");
+            }
+        }
+
         await updateNotificationIndicator();
         if ((currentUserRole || "").toUpperCase() === "SHIPPER") {
             await openDashboardReviewModalOnLogin();

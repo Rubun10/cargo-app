@@ -237,6 +237,12 @@
 	    cursor: not-allowed;
 	}
 
+	.action-buttons {
+	    display: flex;
+	    gap: 10px;
+	    flex-shrink: 0;
+	}
+
 	.accept-btn {
 	    background: #16a34a;
 	    color: #fff;
@@ -258,6 +264,29 @@
 	}
 
 	.accept-btn:active {
+	    transform: scale(0.98);
+	}
+
+	.delete-btn {
+	    background: #ef4444;
+	    color: #fff;
+	    border: none;
+	    padding: 12px 18px;
+	    border-radius: 8px;
+	    cursor: pointer;
+	    font-weight: 600;
+	    transition: all 0.2s ease;
+	    font-size: 14px;
+	    white-space: nowrap;
+	    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+	}
+
+	.delete-btn:hover {
+	    opacity: 0.95;
+	    transform: scale(1.02);
+	}
+
+	.delete-btn:active {
 	    transform: scale(0.98);
 	}
 
@@ -453,6 +482,16 @@
 	        width: 100%;
 	        text-align: center;
 	    }
+
+	    .delete-btn {
+	        width: 100%;
+	        text-align: center;
+	    }
+
+	    .action-buttons {
+	        width: 100%;
+	        flex-direction: column;
+	    }
 	    
 	    .details-grid {
 	        grid-template-columns: 1fr;
@@ -501,6 +540,7 @@
 	/* Print styles */
 	@media print {
 	    .details-btn,
+	    .delete-btn,
 	    .modal-actions,
 	    .top-bar input {
 	        display: none;
@@ -544,6 +584,7 @@
 	const API = "/api/my-activities";
 
 	let allLoads = [];   // ✅ store all loads here
+	const deletableStatuses = new Set(["AVAILABLE", "PENDING", "DRIVER_REQUESTED", "CONFIRM"]);
 
 
 	// -----------------------------
@@ -579,8 +620,18 @@
 
 	            allLoads.forEach(load => {
 
-	                const actionBtn =
+	                const statusValue = (load.status || "").toUpperCase();
+	                const canDelete = deletableStatuses.has(statusValue);
+
+	                const detailsBtn =
 	                    `<button class="details-btn" onclick="openDetails('${load.loadId}')">Details</button>`;
+
+	                const deleteBtn = canDelete
+	                    ? `<button class="delete-btn" onclick="deleteLoad('${load.loadId}')">Delete</button>`
+	                    : "";
+
+	                const actionBtn =
+	                    `<div class="action-buttons">${detailsBtn}${deleteBtn}</div>`;
 
 	                cargoContainer.innerHTML += `
 	                    <div class="cargo-card">
@@ -662,6 +713,47 @@
 	// -----------------------------
 	window.closeDetails = function () {
 	    detailsModal.style.display = "none";
+	};
+
+	// -----------------------------
+	// Delete Cargo
+	// -----------------------------
+	window.deleteLoad = function (loadId) {
+
+	    if (!confirm("Delete this cargo? This cannot be undone.")) {
+	        return;
+	    }
+
+	    fetch(`${API}/${encodeURIComponent(loadId)}`, {
+	        method: "DELETE",
+	        credentials: "include"
+	    })
+	        .then(async res => {
+	            if (res.status === 401) {
+	                alert("Session expired. Please login again.");
+	                window.location.href = "/login";
+	                return;
+	            }
+
+	            if (!res.ok) {
+	                let message = "Unable to delete cargo";
+	                try {
+	                    const data = await res.json();
+	                    if (data && data.message) {
+	                        message = data.message;
+	                    }
+	                } catch (e) {
+	                    // Ignore JSON parse errors
+	                }
+	                alert(message);
+	                return;
+	            }
+
+	            loadCargos();
+	        })
+	        .catch(() => {
+	            alert("Unable to delete cargo");
+	        });
 	};
 
 	// -----------------------------

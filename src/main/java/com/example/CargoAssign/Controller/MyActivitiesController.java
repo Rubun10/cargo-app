@@ -1,9 +1,13 @@
 package com.example.CargoAssign.Controller;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,6 +53,47 @@ public class MyActivitiesController {
                 );
 
         return ResponseEntity.ok(loads);
+    }
+
+    @DeleteMapping("/my-activities/{loadId}")
+    public ResponseEntity<?> deleteMyActivity(@PathVariable String loadId, HttpSession session) {
+
+        User sessionUser = (User) session.getAttribute("LOGGED_USER");
+
+        if (sessionUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        if (!"SHIPPER".equalsIgnoreCase(sessionUser.getRole())) {
+            return ResponseEntity.status(403).body(Map.of("message", "Only shipper can delete cargo"));
+        }
+
+        Optional<PostLoad> loadOpt = postLoadRepo.findById(loadId);
+
+        if (loadOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("message", "Cargo not found"));
+        }
+
+        PostLoad load = loadOpt.get();
+
+        if (load.getUser() == null || !load.getUser().getId().equals(sessionUser.getId())) {
+            return ResponseEntity.status(403).body(Map.of("message", "Not authorized to delete this cargo"));
+        }
+
+        List<LoadStatus> deletableStatuses = List.of(
+                LoadStatus.AVAILABLE,
+                LoadStatus.PENDING,
+                LoadStatus.DRIVER_REQUESTED,
+                LoadStatus.CONFIRM
+        );
+
+        if (!deletableStatuses.contains(load.getStatus())) {
+            return ResponseEntity.status(409).body(Map.of("message", "This cargo cannot be deleted now"));
+        }
+
+        postLoadRepo.delete(load);
+
+        return ResponseEntity.ok(Map.of("message", "Cargo deleted"));
     }
     
     @GetMapping("/active-trips")

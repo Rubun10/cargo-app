@@ -1,3 +1,4 @@
+   
 package com.example.CargoAssign.Controller;
 
 import java.util.Map;
@@ -136,5 +137,36 @@ public class AuthController {
                 Map.of("success", true, "message", "Logged out successfully")
         );
     }
-}
+     // ================= FORGOT PASSWORD CHECK EMAIL =================
+    @PostMapping("/check-email")
+    public ResponseEntity<?> checkEmail(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        if (email == null || email.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Email required", "exists", false));
+        }
+        boolean exists = userRepository.findByEmail(email.trim().toLowerCase()).isPresent();
+        if (exists) {
+            return ResponseEntity.ok(Map.of("exists", true));
+        } else {
+            return ResponseEntity.ok(Map.of("exists", false, "message", "Email not found"));
+        }
+    }
 
+    // ================= FORGOT PASSWORD RESET =================
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        String newPassword = payload.get("newPassword");
+        if (email == null || email.trim().isEmpty() || newPassword == null || newPassword.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Email and new password required"));
+        }
+        var optUser = userRepository.findByEmail(email.trim().toLowerCase());
+        if (optUser.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Email not found"));
+        }
+        User user = optUser.get();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return ResponseEntity.ok(Map.of("message", "Password changed successfully!"));
+    }
+}

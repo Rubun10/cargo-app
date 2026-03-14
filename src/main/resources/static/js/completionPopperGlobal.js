@@ -196,12 +196,15 @@
     }, 4200);
   }
 
-  async function fetchRole() {
+  async function fetchCurrentUser() {
     try {
       const res = await fetch("/api/user/me", { credentials: "include" });
       if (!res.ok) return null;
       const user = await res.json();
-      return String(user.role || "").toUpperCase();
+      return {
+        role: String(user.role || "").toUpperCase(),
+        userId: user.userId
+      };
     } catch (_) {
       return null;
     }
@@ -295,6 +298,22 @@
     } catch (_) {}
   }
 
+  async function showKycApprovedFallback(userId) {
+    if (!userId) return;
+    const key = `kycApprovedShown:${userId}`;
+    if (localStorage.getItem(key) === "true") return;
+    try {
+      const res = await fetch("/api/kyc/status", { credentials: "include" });
+      if (!res.ok) return;
+      const payload = await res.json();
+      if (payload && payload.kycCompleted === true) {
+        ensurePopperDom(true, true);
+        showPopper("Your KYC has been Approved!", true, true);
+        localStorage.setItem(key, "true");
+      }
+    } catch (_) {}
+  }
+
   // Monitor for driver review completion notifications
   async function monitorDriverReviewNotifications(role) {
     if (role !== "DRIVER") return;
@@ -336,8 +355,9 @@
   }
 
   async function init() {
-    const role = await fetchRole();
-    if (role !== "DRIVER" && role !== "SHIPPER") return;
+    const user = await fetchCurrentUser();
+    if (!user || (user.role !== "DRIVER" && user.role !== "SHIPPER")) return;
+    const role = user.role;
     const hasLocalCompletionPopper = !!document.getElementById("completionPopper");
     
     // Initialize completion popper only on pages without local completion popper
@@ -350,6 +370,7 @@
     ensurePopperDom(true, true);  // approval
     ensurePopperDom(true, false); // rejection
     await monitorKYCNotifications();
+    await showKycApprovedFallback(user.userId);
     await monitorDriverReviewNotifications(role);
     
     if (pollId) clearInterval(pollId);
