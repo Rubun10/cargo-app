@@ -7,7 +7,6 @@
   const KYC_SEEN_KEY = "globalKYCSeenIds";
   const REVIEW_SEEN_KEY = "globalDriverReviewSeenIds";
   let completionBaselineReady = false;
-  let kycBaselineReady = false;
   let reviewBaselineReady = false;
   let pollId = null;
   let timerId = null;
@@ -242,7 +241,7 @@
     } catch (_) {}
   }
 
-  // Monitor for KYC notifications
+  // Monitor for KYC notifications (show for unread items even on first load)
   async function monitorKYCNotifications() {
     try {
       const res = await fetch("/api/notifications", { 
@@ -256,30 +255,40 @@
       const seen = getKYCSeenSet();
       const kycNotifications = notifications.filter(n => {
         const type = (n.type || "").toString().toUpperCase();
-        return type === "KYC_APPROVED" || type === "KYC_REJECTED";
+        return (type === "KYC_APPROVED" || type === "KYC_REJECTED") && n.read === false;
       });
 
-      // Initialize baseline
-      if (!kycBaselineReady) {
-        kycNotifications.forEach(n => seen.add(String(n.id)));
-        saveKYCSeenSet(seen);
-        kycBaselineReady = true;
-        return;
-      }
-
-      // Check for new KYC notifications
+      // Show only the latest unread KYC notification once.
       const newKYCNotifications = kycNotifications.filter(n => !seen.has(String(n.id)));
       if (newKYCNotifications.length > 0) {
-        newKYCNotifications.forEach(n => {
-          seen.add(String(n.id));
-          const isApproval = (n.type || "").toString().toUpperCase() === "KYC_APPROVED";
-          const message = isApproval 
-            ? "Your KYC has been Approved! " 
+        const latest = newKYCNotifications
+          .slice()
+          .sort((a, b) => {
+            const aTime = a && a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const bTime = b && b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            if (aTime !== bTime) return bTime - aTime;
+            const aId = Number(a && a.id) || 0;
+            const bId = Number(b && b.id) || 0;
+            return bId - aId;
+          })[0];
+
+        if (latest) {
+          const isApproval = (latest.type || "").toString().toUpperCase() === "KYC_APPROVED";
+          const message = isApproval
+            ? "Your KYC has been Approved! "
             : "Your KYC has been Rejected. Please resubmit correct documents.";
-          
-          // Create KYC popper DOM if needed
+
           ensurePopperDom(true, isApproval);
           showPopper(message, true, isApproval);
+        }
+
+        // Mark all unread KYC notifications as read so the popper shows only once.
+        newKYCNotifications.forEach(n => {
+          seen.add(String(n.id));
+          fetch(`/api/notifications/${n.id}/read`, {
+            method: "POST",
+            credentials: "include"
+          }).catch(() => {});
         });
         saveKYCSeenSet(seen);
       }
