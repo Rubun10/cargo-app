@@ -109,6 +109,19 @@
         }
 
         /* Active / offline */
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .unit-toggle {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            overflow: hidden;
+        }
         .unit-btn {
             display: inline-flex;
             align-items: center;
@@ -117,12 +130,15 @@
             height: 28px;
             padding: 0 0.7rem;
             background: transparent;
-            border: 1px;
+            border: 0;
             color: #fff;
             cursor: pointer;
             font-size: 0.72rem;
             font-weight: 700;
             transition: all 0.2s ease;
+        }
+        .unit-btn + .unit-btn {
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
         }
         .unit-btn.active {
             background: #ffffff;
@@ -245,6 +261,7 @@
         }
         .more-menu{
             display: none;
+            position: relative;
         }
 		.toast-notification {
 		    position: fixed;
@@ -444,12 +461,8 @@
 
             /* Driver status toggle */
             .unit-toggle {
-                display: inline-flex;
-                position: absolute;
-                top: 50%;
-                right: 3rem;
-                transform: translateY(-50%);
-                width: auto;
+                position: static;
+                transform: none;
                 margin-top: 0;
                 z-index: 1002;
             }
@@ -461,12 +474,14 @@
                 text-align: center;
                 line-height: 1;
             }
-           
+
+            .topbar-actions {
+                order: 3;
+                margin-left: auto;
+            }
+
             .more-menu {
                 display: block;
-                position: relative;
-                left:96%;
-                margin-left: 1rem;
                 cursor: pointer;
             }
             .more-menu i {
@@ -659,21 +674,24 @@
             <a href="/contact">Contact</a>
         </nav>
         
-        <!-- More menu (3 dots) -->
-        <div class="more-menu">
-            <i class="fas fa-ellipsis-v" id="moreMenuBtn"></i>
-        
-            <div class="more-dropdown" id="moreDropdown">
-                <a href="/home">Home</a>
-				<a><p onclick="goTo('notificationPage')" class="notification-link">Notification</p></a>
-                <a href="/contact">Contact</a>
+        <div class="topbar-actions">
+            <!-- status -->
+            <div class="unit-toggle" id="unitToggle">
+                <button type="button" class="unit-btn active" data-status="ONLINE">ONLINE</button>
+                <button type="button" class="unit-btn" data-status="OFFLINE">OFFLINE</button>
+            </div>
+
+            <!-- More menu (3 dots) -->
+            <div class="more-menu">
+                <i class="fas fa-ellipsis-v" id="moreMenuBtn"></i>
+
+                <div class="more-dropdown" id="moreDropdown">
+                    <a href="/home">Home</a>
+                    <a><p onclick="goTo('notificationPage')" class="notification-link">Notification</p></a>
+                    <a href="/contact">Contact</a>
+                </div>
             </div>
         </div>
-        <!-- status -->
-		<div class="unit-toggle" id="unitToggle">
-		    <button type="button" class="unit-btn active" data-status="ONLINE">ONLINE</button>
-		    <button type="button" class="unit-btn" data-status="OFFLINE">OFFLINE</button>
-		</div>
 
     </header>
     <div class="unread-corner-arrow" id="unreadCornerArrow" title="Unread notifications" onclick="goTo('notificationPage')" >&#8593;</div>

@@ -24,6 +24,11 @@ public class PageController {
     public String loginPage() {
         return "LoginPage";
     }
+    //forgot password page
+    @GetMapping("/forgot-password")
+    public String forgotPasswordPage() {
+        return "forgotPassword";
+    }
     //register page
     @GetMapping("/register")
     public String registerPage() {
